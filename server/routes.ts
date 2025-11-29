@@ -105,7 +105,7 @@ export async function registerRoutes(
       const updates: any = { status };
 
       // Nustatyti išspręsta, kai statusas pasikeičia į išsprestą
-      if (status === "išspręsta" && previousStatus !== "išspręsta") {
+      if (status === "Išspręstas" && previousStatus !== "Išspręstas") {
         updates.resolvedAt = new Date();
       }
 
@@ -146,7 +146,7 @@ export async function registerRoutes(
       const previousStatus = incident.status;
       const updatedIncident = await storage.updateIncident(req.params.id, {
         assignedTo,
-        status: "priskirtas",
+        status: "Paskirtas",
       });
 
       // Sukurti istorijos įrašą
