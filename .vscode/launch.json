@@ -1,0 +1,61 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch Edge (macOS)",
+            "type": "pwa-msedge",
+            "request": "launch",
+            "url": "http://localhost:8080",
+            "webRoot": "${workspaceFolder}/client",
+            "runtimeExecutable": "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
+            "userDataDir": "${workspaceFolder}/.vscode/edge-profile"
+        },
+        {
+            "name": "Launch Edge (Vite 5173)",
+            "type": "pwa-msedge",
+            "request": "launch",
+            "url": "http://localhost:5173",
+            "webRoot": "${workspaceFolder}/client",
+            "runtimeExecutable": "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
+            "userDataDir": "${workspaceFolder}/.vscode/edge-profile-5173"
+        },
+        {
+            "name": "Run Server (npm dev)",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run", "dev"],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "autoAttachChildProcesses": true
+        },
+        {
+            "name": "Build Client (npm build)",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["run", "build:client"],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
+        },
+        {
+            "type": "pwa-chrome",
+            "name": "Launch Chrome",
+            "request": "launch",
+            "url": "http://localhost:8080",
+            "webRoot": "${workspaceFolder}/client"
+        }
+    ]
+    ,
+    "compounds": [
+        {
+            "name": "Run Server + Launch Edge",
+            "configurations": [
+                "Build Client (npm build)",
+                "Run Server (npm dev)",
+                "Launch Edge (macOS)"
+            ]
+        }
+    ]
+}

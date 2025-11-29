@@ -1,0 +1,59 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Start Server (npm dev)",
+      "type": "shell",
+      "command": "npm run dev",
+      "presentation": {
+        "panel": "shared",
+        "reveal": "always"
+      },
+      "problemMatcher": {
+        "owner": "custom",
+        "pattern": [
+          {
+            "regexp": ".*",
+            "file": 1,
+            "location": 2,
+            "message": 3
+          }
+        ],
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*",
+          "endsPattern": "(listening|Listening|Local:|started|ready)"
+        }
+      }
+    },
+    {
+      "label": "Build Client (Vite)",
+      "type": "shell",
+      "command": "npx vite build --root client",
+      "group": "build",
+      "presentation": {
+        "panel": "shared",
+        "reveal": "always"
+      }
+    },
+    {
+      "label": "Build & Start",
+      "dependsOn": ["Build Client (Vite)", "Start Server (npm dev)"],
+      "dependsOrder": "sequence",
+      "type": "shell",
+      "command": "echo Build & Start tasks launched",
+      "problemMatcher": []
+    }
+    ,
+    {
+      "label": "Git Commit Changes",
+      "type": "shell",
+      "command": "git add -A && git commit -m \"chore: add VSCode launch/config and tasks for Edge/dev\" || echo 'No changes to commit'",
+      "presentation": {
+        "panel": "shared",
+        "reveal": "always"
+      },
+      "problemMatcher": []
+    }
+  ]
+}
