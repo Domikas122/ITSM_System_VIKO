@@ -1,64 +1,64 @@
-# Incident Management System
+# Incidentų valdymo sistema
 
-## Overview
-A web-based IT and cyber incident management system that allows employees to register incidents, and specialists to manage them, view their history, and receive AI-powered recommendations. Built with a modern full-stack JavaScript/TypeScript architecture.
+## Apžvalga
+Žiniatinklio pagrindu sukurta IT ir kibernetinių incidentų valdymo sistema, leidžianti darbuotojams registruoti incidentus, o specialistams – juos valdyti, peržiūrėti jų istoriją ir gauti dirbtinio intelekto rekomendacijas. Sukurta naudojant modernią pilno steko „JavaScript“ / „TypeScript“ architektūrą.
 
-## Tech Stack
-- **Frontend**: React with TypeScript, Tailwind CSS, Shadcn UI components
-- **Backend**: Express.js with TypeScript
-- **State Management**: TanStack Query (React Query)
-- **AI Integration**: OpenAI GPT-5 for incident analysis
-- **Routing**: Wouter
-- **Storage**: In-memory (MemStorage) - ready for PostgreSQL migration
+## Technologijų paketas
+- **Priekinė dalis**: „React“ su „TypeScript“, „Tailwind CSS“, „Shadcn“ UI komponentais
+- **Galinė dalis**: „Express.js“ su „TypeScript“
+- **Būsenos valdymas**: „TanStack“ užklausa („React“ užklausa)
+- **DI integracija**: „OpenAI GPT-5“ incidentų analizei
+- **Maršruto parinkimas**: „Wouter“
+- **Saugykla**: Atmintyje (MemStorage) – paruošta „PostgreSQL“ perkėlimui
 
-## Project Structure
+## Projekto struktūra
 ```
-├── client/              # Frontend React application
-│   ├── src/
-│   │   ├── components/  # Reusable UI components
-│   │   ├── pages/       # Page components
-│   │   ├── lib/         # Utilities and contexts
-│   │   └── hooks/       # Custom React hooks
-├── server/              # Backend Express server
-│   ├── routes.ts        # API endpoints
-│   ├── storage.ts       # Data storage layer
-│   └── openai.ts        # OpenAI integration
-└── shared/              # Shared types and schemas
-    └── schema.ts        # Data models and validation
+├── klientas/ # Priekinė „React“ programa
+│ ├── src/
+│ │ ├── komponentai/ # Daugkartinio naudojimo UI komponentai
+│ │ ├── puslapiai/ # Puslapio komponentai
+│ │ ├── lib/ # Įrankiai ir kontekstai
+│ │ └── kabliukai/ # Pasirinktiniai „React“ kabliukai
+├── serveris/ # „Backend Express“ serveris
+│ ├── route's.ts # API galiniai taškai
+│ ├── storage.ts # Duomenų saugojimo sluoksnis
+│ └── openai.ts # „OpenAI“ integracija
+└── bendrinami/ # Bendrinami tipai ir schemos
+└── schema.ts # Duomenų modeliai ir patvirtinimas
 ```
 
-## Key Features
-1. **Incident Registration** - Form with title, description, category (IT/Cyber), severity, affected systems
-2. **Dashboard** - Stats cards, filtering, incident list for specialists
-3. **Role-Based Views** - Employee view (own incidents) vs Specialist view (all incidents)
-4. **Status Workflow** - New → Assigned → In Progress → Resolved → Closed
-5. **AI Analysis** - OpenAI-powered incident analysis and tag suggestions
-6. **Similar Incidents** - Finds related past incidents for reference
-7. **History Timeline** - Tracks all status changes and updates
+## Pagrindinės funkcijos
+1. **Incidentų registracija** – forma su pavadinimu, aprašymu, kategorija (IT/kibernetinis), svarba, paveiktomis sistemomis
+2. **Valdymo skydas** – statistikos kortelės, filtravimas, incidentų sąrašas specialistams
+3. **Vaidmenimis pagrįsti rodiniai** – darbuotojo rodinys (savo incidentai) ir specialisto rodinys (visi incidentai)
+4. **Būsenos darbo eiga** – naujas → priskirtas → vykdomas → išspręstas → uždarytas
+5. **DI analizė** – „OpenAI“ pagrįsta incidentų analizė ir žymų pasiūlymai
+6. **Panašūs incidentai** – Randa susijusius ankstesnius incidentus nuorodai
+7. **Istorijos laiko juosta** – Seka visus būsenos pakeitimus ir atnaujinimus
 
-## API Endpoints
-- `GET /api/incidents` - List incidents with optional filters
-- `GET /api/incidents/stats` - Dashboard statistics
-- `GET /api/incidents/:id` - Get incident with details
-- `POST /api/incidents` - Create new incident
-- `PATCH /api/incidents/:id/status` - Update incident status
-- `PATCH /api/incidents/:id/assign` - Assign incident to specialist
-- `POST /api/incidents/:id/analyze` - Run AI analysis
+## API galiniai taškai
+- `GET /api/incidents` – Pateikia incidentų sąrašą su pasirinktiniais filtrais
+- `GET /api/incidents/stats` – Prietaisų skydelio statistika
+- `GET /api/incidents/:id` – Gauti incidentą su išsamia informacija
+- `POST /api/incidents` – Sukurti naują incidentą
+- `PATCH /api/incidents/:id/status` – Atnaujinti incidento būseną
+- `PATCH /api/incidents/:id/assign` – Priskirti incidentą specialistui
+- `POST /api/incidents/:id/analyze` – Vykdyti DI analizę
 
-## Environment Variables
-- `OPENAI_API_KEY` - Required for AI analysis (optional - works with mock analysis if not set)
+## Aplinkos kintamieji
+- `OPENAI_API_KEY` – Būtinas DI analizei (neprivaloma – veikia su bandomąja analize, jei nenustatyta)
 
-## Running the Application
-The application runs on port 5000 with `npm run dev`.
+## Programos paleidimas
+The Programa veikia per 5000 prievadą su „npm run dev“.
 
-## User Preferences
-- Clean, professional design following Linear/ServiceNow patterns
-- Information-dense but scannable interface
-- Dark mode support
-- Responsive layout with sidebar navigation
+## Vartotojo nuostatos
+- Švarus, profesionalus dizainas, atitinkantis „Linear“ / „ServiceNow“ šablonus
+- Informacijos kupina, bet lengvai skenuojama sąsaja
+- Tamsaus režimo palaikymas
+- Adaptyvus išdėstymas su šonine navigacijos juosta
 
-## Recent Changes
-- Initial MVP implementation with all core features
-- Added dark mode support with theme toggle
-- Implemented role switcher for testing employee/specialist views
-- Created AI analysis panel with OpenAI integration
+## Naujausi pakeitimai
+- Pradinis MVP įdiegimas su visomis pagrindinėmis funkcijomis
+- Pridėtas tamsaus režimo palaikymas su temos perjungimu
+- Įdiegtas vaidmenų perjungiklis darbuotojų / specialistų rodinių testavimui
+- Sukurtas dirbtinio intelekto analizės skydelis su „OpenAI“ integracija

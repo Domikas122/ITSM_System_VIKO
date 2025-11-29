@@ -15,18 +15,18 @@ export async function registerRoutes(
   app: Express
 ): Promise<Server> {
   
-  // Get dashboard stats
+  // Informacijos suvestinės statistiniai duomenys
   app.get("/api/incidents/stats", async (req: Request, res: Response) => {
     try {
       const stats = await storage.getIncidentStats();
       res.json(stats);
     } catch (error) {
-      console.error("Error fetching stats:", error);
-      res.status(500).json({ message: "Failed to fetch stats" });
+      console.error("Klaida gaunant statistinius duomenis:", error);
+      res.status(500).json({ message: "Nepavyko gauti statistikos" });
     }
   });
 
-  // Get all incidents with optional filters
+  // Gauti visus incidentus su optional filtrais
   app.get("/api/incidents", async (req: Request, res: Response) => {
     try {
       const filters: IncidentFilters = {};
@@ -42,39 +42,39 @@ export async function registerRoutes(
 
       let incidents = await storage.getAllIncidents(filters);
       
-      // Filter by reportedBy if provided (for employee view)
+      // Filtruoti pagal „reportedBy“, jei nurodyta (darbuotojo peržiūrai)
       if (reportedBy) {
         incidents = incidents.filter((i) => i.reportedBy === reportedBy);
       }
 
       res.json(incidents);
     } catch (error) {
-      console.error("Error fetching incidents:", error);
-      res.status(500).json({ message: "Failed to fetch incidents" });
+      console.error("Klaida gaunant incidentus:", error);
+      res.status(500).json({ message: "Nepavyko gauti incidentų" });
     }
   });
 
-  // Get single incident with details
+  // Gauti vieną incidentą su detalėmis
   app.get("/api/incidents/:id", async (req: Request, res: Response) => {
     try {
       const incident = await storage.getIncidentWithDetails(req.params.id);
       if (!incident) {
-        return res.status(404).json({ message: "Incident not found" });
+        return res.status(404).json({ message: "Incidentas nerastas" });
       }
       res.json(incident);
     } catch (error) {
-      console.error("Error fetching incident:", error);
-      res.status(500).json({ message: "Failed to fetch incident" });
+      console.error("Klaida gaunant incidentą:", error);
+      res.status(500).json({ message: "Nepavyko gauti incidento" });
     }
   });
 
-  // Create new incident
+  // Sukurti naują incidentą
   app.post("/api/incidents", async (req: Request, res: Response) => {
     try {
       const validation = insertIncidentSchema.safeParse(req.body);
       if (!validation.success) {
         return res.status(400).json({ 
-          message: "Validation failed", 
+          message: "Patvirtinimas nepavyko", 
           errors: validation.error.errors 
         });
       }
@@ -82,41 +82,41 @@ export async function registerRoutes(
       const incident = await storage.createIncident(validation.data);
       res.status(201).json(incident);
     } catch (error) {
-      console.error("Error creating incident:", error);
-      res.status(500).json({ message: "Failed to create incident" });
+      console.error("Klaida kuriant incidentą:", error);
+      res.status(500).json({ message: "Nepavyko sukurti incidento" });
     }
   });
 
-  // Update incident status
+  // Atnaujinti incidento būseną
   app.patch("/api/incidents/:id/status", async (req: Request, res: Response) => {
     try {
       const { status, notes, performedBy } = req.body;
       
       if (!status || !incidentStatuses.includes(status)) {
-        return res.status(400).json({ message: "Invalid status" });
+        return res.status(400).json({ message: "Neteisingas statusas" });
       }
 
       const incident = await storage.getIncident(req.params.id);
       if (!incident) {
-        return res.status(404).json({ message: "Incident not found" });
+        return res.status(404).json({ message: "Incidentas nerastas" });
       }
 
       const previousStatus = incident.status;
       const updates: any = { status };
 
-      // Set resolvedAt when status changes to resolved
-      if (status === "resolved" && previousStatus !== "resolved") {
+      // Nustatyti išspręsta, kai statusas pasikeičia į išsprestą
+      if (status === "išspręsta" && previousStatus !== "išspręsta") {
         updates.resolvedAt = new Date();
       }
 
-      // Set assignedTo when status changes to assigned
-      if (status === "assigned" && !incident.assignedTo) {
+      // Nustatyti priskirtas, kai statusas pasikeičia į priskirtas
+      if (status === "priskirta" && !incident.assignedTo) {
         updates.assignedTo = performedBy;
       }
 
       const updatedIncident = await storage.updateIncident(req.params.id, updates);
 
-      // Create history entry
+      // Sukurti istorijos įrašą
       await storage.createIncidentHistory({
         incidentId: req.params.id,
         action: "status_change",
@@ -128,58 +128,58 @@ export async function registerRoutes(
 
       res.json(updatedIncident);
     } catch (error) {
-      console.error("Error updating incident status:", error);
-      res.status(500).json({ message: "Failed to update incident status" });
+      console.error("Klaida atnaujinant incidento būseną:", error);
+      res.status(500).json({ message: "Nepavyko atnaujinti incidento būsenos" });
     }
   });
 
-  // Assign incident
+  // Paskirti incidentą
   app.patch("/api/incidents/:id/assign", async (req: Request, res: Response) => {
     try {
       const { assignedTo, performedBy } = req.body;
 
       const incident = await storage.getIncident(req.params.id);
       if (!incident) {
-        return res.status(404).json({ message: "Incident not found" });
+        return res.status(404).json({ message: "Incidentas nerastas" });
       }
 
       const previousStatus = incident.status;
       const updatedIncident = await storage.updateIncident(req.params.id, {
         assignedTo,
-        status: "assigned",
+        status: "priskirtas",
       });
 
-      // Create history entry
+      // Sukurti istorijos įrašą
       await storage.createIncidentHistory({
         incidentId: req.params.id,
-        action: "assigned",
+        action: "priskirimas",
         previousStatus,
-        newStatus: "assigned",
+        newStatus: "priskirtas",
         performedBy: performedBy || "system",
-        notes: `Assigned to specialist`,
+        notes: `Priskirta specialistui`,
       });
 
       res.json(updatedIncident);
     } catch (error) {
-      console.error("Error assigning incident:", error);
-      res.status(500).json({ message: "Failed to assign incident" });
+      console.error("Klaida priskiriant incidentą:", error);
+      res.status(500).json({ message: "Nepavyko priskirti incidento" });
     }
   });
 
-  // Analyze incident with AI
+  // Analizuoti incidentą naudojant AI
   app.post("/api/incidents/:id/analyze", async (req: Request, res: Response) => {
     try {
       const incident = await storage.getIncident(req.params.id);
       if (!incident) {
-        return res.status(404).json({ message: "Incident not found" });
+        return res.status(404).json({ message: "Incidentas nerastas" });
       }
 
-      // Check if OpenAI API key is configured
+      // Ar OpenAI API raktas yra sukonfigūruotas
       if (!process.env.OPENAI_API_KEY) {
-        // Return mock analysis when no API key
+        // Grąžinti fiktyvią analizę, kai nėra API rakto
         const mockAnalysis = {
           tags: ["network", "connectivity", "investigation"],
-          analysis: "This incident requires further investigation. Based on the description, it appears to be related to network connectivity issues. Recommend checking network infrastructure and reviewing recent changes.",
+          analysis: "Šis incidentas reikalauja tolesnio tyrimo. Remiantis aprašymu, atrodo, kad jis susijęs su tinklo ryšio problemomis. Rekomenduojama patikrinti tinklo infrastruktūrą ir peržiūrėti naujausius pakeitimus.",
         };
 
         const updatedIncident = await storage.updateIncident(req.params.id, {
@@ -204,19 +204,19 @@ export async function registerRoutes(
 
       res.json(updatedIncident);
     } catch (error) {
-      console.error("Error analyzing incident:", error);
-      res.status(500).json({ message: "Failed to analyze incident" });
+      console.error("Klaida analizuojant incidentą:", error);
+      res.status(500).json({ message: "Nepavyko analizuoti incidento" });
     }
   });
 
-  // Get incident history
+  // Gauti incidentų istoriją
   app.get("/api/incidents/:id/history", async (req: Request, res: Response) => {
     try {
       const history = await storage.getIncidentHistory(req.params.id);
       res.json(history);
     } catch (error) {
-      console.error("Error fetching incident history:", error);
-      res.status(500).json({ message: "Failed to fetch incident history" });
+      console.error("Klaida gaunant incidentų istoriją:", error);
+      res.status(500).json({ message: "Nepavyko gauti incidentų istorijos" });
     }
   });
 

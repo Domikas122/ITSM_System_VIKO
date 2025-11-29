@@ -1,8 +1,8 @@
 import OpenAI from "openai";
 
-// the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
+// Naujausias OpenAI modelis yra „gpt-5“, išleistas 2025 m. rugpjūčio 7 d. Nekeiskite šio modelio, nebent vartotojas aiškiai to paprašytų.
 
-// Only initialize OpenAI client if API key is available
+// Inicijuokite OpenAI klientą tik tuo atveju, jei turite API raktą.
 const openai = process.env.OPENAI_API_KEY 
   ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
   : null;
@@ -20,11 +20,11 @@ export async function analyzeIncident(
   category: string,
   severity: string
 ): Promise<AnalysisResult> {
-  // Return fallback if no API key
+  // fallback, jei nėra API rakto
   if (!openai) {
     return {
       tags: extractKeywords(title, description),
-      analysis: "AI analysis requires an OpenAI API key. Based on keywords, this incident has been tagged automatically.",
+      analysis: "AI analizei reikalingas OpenAI API raktas. Remiantis raktažodžiais, šis incidentas buvo pažymėtas automatiškai.",
     };
   }
 
@@ -34,30 +34,30 @@ export async function analyzeIncident(
       messages: [
         {
           role: "system",
-          content: `You are an IT and Cyber Security incident analysis expert. Analyze the incident and provide:
-1. Relevant tags (3-5 keywords) for categorization
-2. A brief analysis (2-3 sentences) of the incident and potential root causes
-3. Suggestions for resolution based on similar incidents
+          content: `Jūs esate IT ir kibernetinio saugumo incidentų analizės ekspertas. Išanalizuokite incidentą ir pateikite:
+1. Atitinkamos žymos (3–5 raktažodžiai) kategorizavimui
+2. Trumpas incidento ir galimų priežasčių analizė (2–3 sakiniai)
+3. Sprendimo pasiūlymai, pagrįsti panašiais incidentais
 
 Respond in JSON format:
 {
   "tags": ["tag1", "tag2", "tag3"],
-  "analysis": "Brief analysis of the incident...",
-  "suggestedCategory": "it or cyber if the current category seems incorrect",
-  "suggestedSeverity": "critical, high, medium, or low if the current severity seems incorrect"
+  "analysis": "Trumpa incidento analizė...",
+  "suggestedCategory": "IT arba kibernetinis, jei dabartinė kategorija atrodo neteisinga",
+  "suggestedSeverity": "kritinis, aukštas, vidutinis arba žemas, jei dabartinis sunkumas atrodo neteisingas"
 }`,
         },
         {
           role: "user",
-          content: `Analyze this ${category.toUpperCase()} incident:
+          content: `Išanalizuok ${category.toUpperCase()} incidentą:
 
-Title: ${title}
+Pavadinimas: ${title}
 
-Description: ${description}
+Aprašymas: ${description}
 
-Current Severity: ${severity}
+Kategorija: ${severity}
 
-Provide analysis and recommendations.`,
+Pateikti analizę ir rekomendacijas.`,
         },
       ],
       response_format: { type: "json_object" },
@@ -66,16 +66,16 @@ Provide analysis and recommendations.`,
 
     const content = response.choices[0].message.content;
     if (!content) {
-      throw new Error("No response from OpenAI");
+      throw new Error("Nėra atsakymo iš OpenAI");
     }
 
     return JSON.parse(content) as AnalysisResult;
   } catch (error) {
-    console.error("OpenAI analysis error:", error);
-    // Return fallback analysis if API fails
+    console.error("OpenAI analizės klaida:", error);
+    // Grąžinti fallback variantą, jei API nepavyksta
     return {
       tags: extractKeywords(title, description),
-      analysis: "AI analysis is temporarily unavailable. Manual review recommended.",
+      analysis: "AI analizė laikinai neveikia. Rekomenduojama atlikti rankinį patikrinimą.",
     };
   }
 }
@@ -84,7 +84,7 @@ function extractKeywords(title: string, description: string): string[] {
   const text = (title + " " + description).toLowerCase();
   const keywords = new Set<string>();
   
-  // Common IT/Cyber keywords
+  // Dažniausiai naudojami IT/kibernetinio saugumo raktažodžiai
   const patterns = [
     "server", "network", "email", "database", "vpn", "security", 
     "phishing", "malware", "outage", "performance", "access", 

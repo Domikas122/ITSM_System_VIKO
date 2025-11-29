@@ -23,12 +23,12 @@ function sanitizeUser(user: User): SafeUser {
 }
 
 export interface IStorage {
-  // Users (returns sanitized user without password)
+  // Vartotojai (grąžina išvalytą vartotoją be slaptažodžio)
   getUser(id: string): Promise<SafeUser | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>; // Internal use only
+  getUserByUsername(username: string): Promise<User | undefined>; // Tik vidiniam naudojimui
   createUser(user: InsertUser): Promise<SafeUser>;
   
-  // Incidents
+  // Incidentai
   getIncident(id: string): Promise<Incident | undefined>;
   getIncidentWithDetails(id: string): Promise<IncidentWithDetails | undefined>;
   getAllIncidents(filters?: IncidentFilters): Promise<Incident[]>;
@@ -38,7 +38,7 @@ export interface IStorage {
   getIncidentStats(): Promise<DashboardStats>;
   findSimilarIncidents(incidentId: string, description: string): Promise<SimilarIncident[]>;
   
-  // Incident History
+  // Incidentų istorija
   getIncidentHistory(incidentId: string): Promise<IncidentHistory[]>;
   createIncidentHistory(history: InsertIncidentHistory): Promise<IncidentHistory>;
 }
@@ -56,56 +56,56 @@ export class MemStorage implements IStorage {
   }
 
   private initializeDefaultData() {
-    // DEVELOPMENT ONLY: Demo users for testing role-based functionality
-    // In production, users would be created through proper authentication flow
+    // TIK KŪRIMAS: Demo naudotojai, skirti vaidmenų pagrįsto funkcionalumo testavimui
+    // Gamybos procese vartotojai būtų kuriamai per tinkamą autentifikavimo procesą.
     const specialistUser: User = {
       id: "specialist-1",
-      username: "john.smith",
-      password: "password",
-      role: "specialist",
-      displayName: "John Smith",
+      username: "dom.kop",
+      password: "mkl23MKL",
+      role: "IT_specialistas",
+      displayName: "Dominykas Kopijevas",
     };
     
     const employeeUser: User = {
       id: "employee-1",
-      username: "jane.doe",
-      password: "password",
-      role: "employee",
-      displayName: "Jane Doe",
+      username: "ona.mika",
+      password: "abc123ABC",
+      role: "Darbuotojas",
+      displayName: "Ona Mikalauskaitė",
     };
 
     const employeeUser2: User = {
       id: "employee-2",
-      username: "mike.wilson",
-      password: "password",
-      role: "employee",
-      displayName: "Mike Wilson",
+      username: "alb.miz",
+      password: "jkl456JKL",
+      role: "Darbuotojas",
+      displayName: "Albas Mizgaitis",
     };
 
     this.users.set(specialistUser.id, specialistUser);
     this.users.set(employeeUser.id, employeeUser);
     this.users.set(employeeUser2.id, employeeUser2);
 
-    // Create sample incidents for demo
+    // Sukurti pavyzdinius incidentus demonstravimui
     const sampleIncidents = [
       {
-        title: "Email server experiencing intermittent outages",
-        description: "The corporate email server has been going down randomly throughout the day. Users are reporting they cannot send or receive emails for periods of 10-15 minutes. This is affecting productivity across all departments.",
-        category: "it" as const,
-        severity: "high" as const,
-        status: "in_progress" as const,
+        title: "Elektroninio pašto serveris patiria periodinius veikimo sutrikimus",
+        description: "Įmonės elektroninio pašto serveris visą dieną veikia su sutrikimais. Vartotojai praneša, kad 10–15 minučių negali siųsti ir gauti elektroninių laiškų. Tai daro įtaką visų skyrių darbo našumui.",
+        category: "IT" as const,
+        severity: "Aukštas" as const,
+        status: "Vykdomas" as const,
         affectedSystems: ["email", "servers"],
         reportedBy: "employee-1",
         assignedTo: "specialist-1",
         aiTags: ["email", "server outage", "intermittent"],
-        aiAnalysis: "This incident appears to be related to server resource exhaustion. Similar incidents have been resolved by scaling server resources or identifying memory leaks.",
+        aiAnalysis: "Šis incidentas, atrodo, yra susijęs su serverio išteklių išeikvojimu. Panašūs incidentai buvo išspręsti padidinant serverio išteklius arba nustatant atminties nutekėjimus.",
       },
       {
-        title: "Suspicious login attempts detected from foreign IP",
-        description: "Security monitoring detected multiple failed login attempts from IP addresses located in Eastern Europe. The attempts targeted several executive accounts and occurred outside of business hours.",
-        category: "cyber" as const,
-        severity: "critical" as const,
-        status: "new" as const,
+        title: "Įtartini prisijungimo bandymai, aptikti iš užsienio IP adresų",
+        description: "Saugumo stebėjimo sistema aptiko kelis nesėkmingus prisijungimo bandymus iš Rytų Europoje esančių IP adresų. Bandymai buvo nukreipti į kelis vadovų paskyras ir vyko ne darbo valandomis.",
+        category: "Kibernetinis" as const,
+        severity: "Kritinis" as const,
+        status: "Naujas" as const,
         affectedSystems: ["network"],
         reportedBy: "employee-2",
         assignedTo: null,
@@ -113,11 +113,11 @@ export class MemStorage implements IStorage {
         aiAnalysis: null,
       },
       {
-        title: "VPN connection dropping frequently for remote workers",
-        description: "Multiple remote employees have reported that their VPN connections are dropping several times per day. This started after the recent network maintenance window.",
-        category: "it" as const,
-        severity: "medium" as const,
-        status: "assigned" as const,
+        title: "Nuotoliniai darbuotojai dažnai praranda VPN ryšį",
+        description: "Keletas nuotoliniu būdu dirbančių darbuotojų pranešė, kad jų VPN ryšys nutrūksta keletą kartų per dieną. Tai prasidėjo po neseniai atliktų tinklo techninės priežiūros darbų.",
+        category: "IT" as const,
+        severity: "Vidutinis" as const,
+        status: "Paskirtas" as const,
         affectedSystems: ["network", "workstation"],
         reportedBy: "employee-1",
         assignedTo: "specialist-1",
@@ -125,28 +125,28 @@ export class MemStorage implements IStorage {
         aiAnalysis: null,
       },
       {
-        title: "Database performance degradation on production server",
-        description: "The main production database is experiencing slow query times. Average response time has increased from 50ms to 500ms. This is impacting customer-facing applications.",
-        category: "it" as const,
-        severity: "high" as const,
-        status: "resolved" as const,
+        title: "Duomenų bazės našumo sumažėjimas gamybos serveryje",
+        description: "Pagrindinėje gamybos duomenų bazėje užfiksuotas lėtas užklausų apdorojimas. Vidutinis atsakymo laikas padidėjo nuo 50 ms iki 500 ms. Tai daro įtaką klientams skirtoms programoms.",
+        category: "IT" as const,
+        severity: "Aukštas" as const,
+        status: "Išspręstas" as const,
         affectedSystems: ["database", "servers"],
         reportedBy: "employee-2",
         assignedTo: "specialist-1",
         aiTags: ["database", "performance", "slow queries"],
-        aiAnalysis: "Query optimization and index tuning resolved this issue. Added missing indexes on frequently queried columns.",
+        aiAnalysis: "Šią problemą išsprendė užklausų optimizavimas ir indeksų derinimas. Pridėti trūkstami indeksai dažnai užklausiamose stulpeliuose.",
       },
       {
-        title: "Phishing email campaign targeting finance department",
-        description: "Several employees in the finance department received phishing emails that appeared to be from the CEO requesting wire transfers. One employee clicked the link but did not enter credentials.",
-        category: "cyber" as const,
-        severity: "high" as const,
-        status: "closed" as const,
+        title: "Sukčiavimo elektroninio pašto kampanija, skirta finansų skyriui",
+        description: "Keletas finansų skyriaus darbuotojų gavo sukčiavimo laiškus, kurie atrodė esą iš generalinio direktoriaus ir kuriuose buvo prašoma atlikti elektroninius pavedimus. Vienas darbuotojas paspaudė nuorodą, bet neįvedė prisijungimo duomenų.",
+        category: "Kibernetinis" as const,
+        severity: "Aukštas" as const,
+        status: "Uždarytas" as const,
         affectedSystems: ["email"],
         reportedBy: "employee-1",
         assignedTo: "specialist-1",
         aiTags: ["phishing", "social engineering", "finance"],
-        aiAnalysis: "Phishing campaign blocked. Additional email filtering rules implemented. Affected users notified and passwords reset.",
+        aiAnalysis: "Sukčiavimo kampanija užblokuota. Įdiegtos papildomos el. pašto filtravimo taisyklės. Paveikti vartotojai informuoti, slaptažodžiai atkurti.",
       },
     ];
 
@@ -160,21 +160,21 @@ export class MemStorage implements IStorage {
         ...incidentData,
         createdAt,
         updatedAt: new Date(createdAt.getTime() + Math.random() * 24 * 60 * 60 * 1000),
-        resolvedAt: incidentData.status === "resolved" || incidentData.status === "closed" 
+        resolvedAt: (incidentData.status === "Išspręstas" || incidentData.status === "Uždarytas")
           ? new Date(createdAt.getTime() + Math.random() * 3 * 24 * 60 * 60 * 1000)
           : null,
       };
       
       this.incidents.set(id, incident);
       
-      // Add creation history
+      // Pridėti kūrimo istoriją
       const historyId = randomUUID();
       const history: IncidentHistory = {
         id: historyId,
         incidentId: id,
-        action: "created",
+        action: "Sukurtas",
         previousStatus: null,
-        newStatus: "new",
+        newStatus: "Naujas",
         performedBy: incidentData.reportedBy,
         notes: null,
         createdAt,
@@ -183,14 +183,14 @@ export class MemStorage implements IStorage {
     }
   }
 
-  // User methods
+  // Vartotojo metodai
   async getUser(id: string): Promise<SafeUser | undefined> {
     const user = this.users.get(id);
     return user ? sanitizeUser(user) : undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    // Returns full user with password for auth purposes (internal use only)
+    // Grąžina visą vartotoją su slaptažodžiu autentifikavimo tikslais (tik vidiniam naudojimui)
     return Array.from(this.users.values()).find(
       (user) => user.username === username,
     );
@@ -198,12 +198,18 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<SafeUser> {
     const id = randomUUID();
-    const user: User = { ...insertUser, id };
+    const user: User = { 
+      ...insertUser, 
+      id, 
+      role: insertUser.role === "Darbuotojas" || insertUser.role === "IT_specialistas"
+        ? insertUser.role
+        : "Darbuotojas" // default or handle error as needed
+    };
     this.users.set(id, user);
     return sanitizeUser(user);
   }
 
-  // Incident methods
+  // Incidentų metodai
   async getIncident(id: string): Promise<Incident | undefined> {
     return this.incidents.get(id);
   }
@@ -258,7 +264,7 @@ export class MemStorage implements IStorage {
       }
     }
 
-    // Sort by created date descending
+    // Rūšiuoti pagal sukūrimo datą mažėjančia tvarka
     return incidents.sort(
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
@@ -272,9 +278,9 @@ export class MemStorage implements IStorage {
       id,
       title: insertIncident.title,
       description: insertIncident.description,
-      category: insertIncident.category,
-      severity: insertIncident.severity,
-      status: "new",
+      category: insertIncident.category as "IT" | "Kibernetinis",
+      severity: insertIncident.severity as "Kritinis" | "Aukštas" | "Vidutinis" | "Žemas",
+      status: "Naujas",
       affectedSystems: insertIncident.affectedSystems || null,
       reportedBy: insertIncident.reportedBy,
       assignedTo: null,
@@ -287,12 +293,12 @@ export class MemStorage implements IStorage {
     
     this.incidents.set(id, incident);
 
-    // Create history entry
+    // Sukurti istorijos įrašą
     await this.createIncidentHistory({
       incidentId: id,
-      action: "created",
+      action: "Sukurtas",
       previousStatus: null,
-      newStatus: "new",
+      newStatus: "Naujas",
       performedBy: insertIncident.reportedBy,
       notes: null,
     });
@@ -322,11 +328,11 @@ export class MemStorage implements IStorage {
     const incidents = Array.from(this.incidents.values());
     
     const byStatus: Record<IncidentStatus, number> = {
-      new: 0,
-      assigned: 0,
-      in_progress: 0,
-      resolved: 0,
-      closed: 0,
+      Naujas: 0,
+      Paskirtas: 0,
+      Vykdomas: 0,
+      Išspręstas: 0,
+      Uždarytas: 0,
     };
 
     const bySeverity: Record<string, number> = {
@@ -359,7 +365,7 @@ export class MemStorage implements IStorage {
     const incidents = Array.from(this.incidents.values())
       .filter((i) => i.id !== incidentId);
 
-    // Simple keyword-based similarity (in production, use embeddings)
+    // Paprastas panašumas pagal raktažodžius (gamybos procese naudokite įterpimus)
     const keywords = description.toLowerCase().split(/\s+/).filter(w => w.length > 3);
     
     const similar: SimilarIncident[] = [];
@@ -386,7 +392,7 @@ export class MemStorage implements IStorage {
       .slice(0, 5);
   }
 
-  // Incident History methods
+  // Incidentų istorijos metodai
   async getIncidentHistory(incidentId: string): Promise<IncidentHistory[]> {
     return Array.from(this.incidentHistory.values())
       .filter((h) => h.incidentId === incidentId)
@@ -397,7 +403,16 @@ export class MemStorage implements IStorage {
     const id = randomUUID();
     const history: IncidentHistory = {
       id,
-      ...insertHistory,
+      incidentId: insertHistory.incidentId,
+      action: insertHistory.action,
+      performedBy: insertHistory.performedBy,
+      previousStatus: (["Naujas", "Paskirtas", "Vykdomas", "Išspręstas", "Uždarytas"].includes(insertHistory.previousStatus as string)
+        ? insertHistory.previousStatus as "Naujas" | "Paskirtas" | "Vykdomas" | "Išspręstas" | "Uždarytas"
+        : null),
+      newStatus: (["Naujas", "Paskirtas", "Vykdomas", "Išspręstas", "Uždarytas"].includes(insertHistory.newStatus as string) 
+        ? insertHistory.newStatus as "Naujas" | "Paskirtas" | "Vykdomas" | "Išspręstas" | "Uždarytas"
+        : null),
+      notes: insertHistory.notes ?? null,
       createdAt: new Date(),
     };
     this.incidentHistory.set(id, history);

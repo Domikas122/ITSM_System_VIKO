@@ -1,77 +1,77 @@
-# Quick Start Guide — IncidentPilot
+# Greito paleidimo vadovas — IncidentPilot
 
-## Prerequisites
-- Node.js (v20+) and npm installed
+## Būtinos sąlygos
+- Įdiegta „Node.js“ (v20+) ir „npm“
 - macOS
-- Microsoft Edge browser
+- „Microsoft Edge“ naršyklė
 
-## Setup
+## Sąranka
 
-### 1. Install Dependencies
+### 1. Įdiegti priklausomybes
 ```bash
 cd /Users/domikas122/Downloads/IncidentPilot
 npm install
 ```
 
-### 2. Run with VS Code (Recommended)
-- Open the project in VS Code
-- Go to **Run and Debug** (left sidebar)
-- Select **"Run Server + Launch Edge"**
-- Click the green **Play** button
-- This will:
-  - Build the client
-  - Start the dev server on `http://localhost:8080`
-  - Open Microsoft Edge automatically
+### 2. Paleisti su VS Code (rekomenduojama)
+- Atidaryti projektą VS Code
+- Eiti į **Vykdyti ir derinti** (kairėje šoninėje juostoje)
+- Pasirinkite **„Paleisti serverį + paleisti Edge“**
+- Spustelėkite žalią mygtuką **Paleisti**
+- Tai:
+- Sukurs klientą
+- Paleis kūrėjų serverį `http://localhost:8080`
+- Automatiškai atidarys „Microsoft Edge“
 
-### 3. Manual Run (Terminal)
+### 3. Rankinis paleidimas (terminalas)
 ```bash
 npm run dev
 ```
-Then open `http://localhost:8080` in your browser.
+Tada naršyklėje atidarykite `http://localhost:8080`.
 
-## Available npm Scripts
-- `npm run dev` — Start development server
-- `npm run build:client` — Build client (Vite)
-- `npm run build` — Full build
-- `npm run start` — Start production server
-- `npm check` — Type check
+## Galimi npm scenarijai
+- `npm run dev` — Paleisti kūrimo serverį
+- `npm run build:client` — Sukurti klientą (Vite)
+- `npm run build` — Pilnas kūrimas
+- `npm run start` — Paleisti gamybos serverį
+- `npm check` — Tipo patikrinimas
 
-## Debug Configurations
-- **"Run Server + Launch Edge"** — Server + client build + Edge launch (recommended)
-- **"Launch Edge (macOS)"** — Open Edge pointed at `localhost:8080`
-- **"Launch Edge (Vite 5173)"** — Alt: If running Vite separately on port 5173
-- **"Run Server (npm dev)"** — Start server only
-- **"Build Client (npm build)"** — Build client only
+## Derinimo konfigūracijos
+- **"Paleisti serverį + paleisti Edge"** — Serverio + kliento kūrimas + Edge paleidimas (rekomenduojama)
+- **"Paleisti Edge (macOS)"** — Atviras Edge, nukreiptas į `localhost:8080`
+- **"Paleisti Edge (Vite 5173)"** — Alt: Jei Vite veikia atskirai per 5173 prievadą
+- **"Paleisti serverį (npm dev)"** — Paleisti tik serverį
+- **"Sukurti klientą (npm build)"** — Sukurti tik klientą
 
-## Troubleshooting
+## Trikčių šalinimas
 
-### Port Already in Use
-If port 8080 is in use:
+### Prievadas jau naudojamas
+Jei 8080 prievadas naudojamas:
 ```bash
-# Find process using port 8080
+# Rasti procesą, naudojantį 8080 prievadą
 lsof -i :8080
-# Kill it
+# Nutraukti
 kill -9 <PID>
 ```
 
-### Dependencies Not Installed
+### Priklausomybės neįdiegtos
 ```bash
 npm install
 ```
 
-### Edge Not Opening
-Ensure Edge is installed and try:
+### Edge neatsidaro
+Įsitikinkite, kad Edge įdiegtas, ir pabandykite:
 ```bash
 open -a "Microsoft Edge" http://localhost:8080
 ```
 
-## Project Structure
+## Projekto struktūra
 - `/client` — React frontend (Vite)
 - `/server` — Express backend (Node.js)
-- `/shared` — Shared types/schema
-- `.vscode/` — VS Code config (launch/tasks)
+- `/shared` — Bendrinami tipai/schema
+- `.vscode/` — VS Code konfigūracija (paleidimas/užduotys)
 
-## Notes
-- Server listens on `localhost:8080` (not 0.0.0.0 for compatibility)
-- Edge profile stored in `.vscode/edge-profile/` (ignored by git)
-- Clean git history — `.vscode/edge-profile/` removed from commits
+## Pastabos
+- Serveris klausosi `localhost:8080` (ne 0.0.0.0 dėl suderinamumo)
+- Edge profilis saugomas `.vscode/edge-profile/` (ignoruojamas git)
+- Išvalyti git istoriją — `.vscode/edge-profile/` pašalintas iš pakeitimų

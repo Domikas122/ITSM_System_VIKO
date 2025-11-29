@@ -2,20 +2,20 @@ import { pgTable, text, varchar, timestamp, integer } from "drizzle-orm/pg-core"
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Incident status workflow: New → Assigned → In Progress → Resolved → Closed
-export const incidentStatuses = ["new", "assigned", "in_progress", "resolved", "closed"] as const;
+// Incident status workflow: Naujas → Paskirtas → Vykdomas → Išspręstas → Uždarytas
+export const incidentStatuses = ["Naujas", "Paskirtas", "Vykdomas", "Išspręstas", "Uždarytas"] as const;
 export type IncidentStatus = typeof incidentStatuses[number];
 
 // Incident categories
-export const incidentCategories = ["it", "cyber"] as const;
+export const incidentCategories = ["IT", "Kibernetinis"] as const;
 export type IncidentCategory = typeof incidentCategories[number];
 
 // Severity levels
-export const severityLevels = ["critical", "high", "medium", "low"] as const;
+export const severityLevels = ["Kritinis", "Aukštas", "Vidutinis", "Žemas"] as const;
 export type SeverityLevel = typeof severityLevels[number];
 
 // User roles
-export const userRoles = ["employee", "specialist"] as const;
+export const userRoles = ["Darbuotojas", "IT_specialistas"] as const;
 export type UserRole = typeof userRoles[number];
 
 // Users table
@@ -23,7 +23,7 @@ export const users = pgTable("users", {
   id: varchar("id", { length: 36 }).primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
-  role: text("role").$type<UserRole>().notNull().default("employee"),
+  role: text("role").$type<UserRole>().notNull().default("Darbuotojas"),
   displayName: text("display_name").notNull(),
 });
 
@@ -31,14 +31,14 @@ export const insertUserSchema = createInsertSchema(users).omit({ id: true });
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 
-// Incidents table
+// Incidentų lentelė
 export const incidents = pgTable("incidents", {
   id: varchar("id", { length: 36 }).primaryKey(),
   title: text("title").notNull(),
   description: text("description").notNull(),
   category: text("category").$type<IncidentCategory>().notNull(),
   severity: text("severity").$type<SeverityLevel>().notNull(),
-  status: text("status").$type<IncidentStatus>().notNull().default("new"),
+  status: text("status").$type<IncidentStatus>().notNull().default("Naujas"),
   affectedSystems: text("affected_systems").array(),
   reportedBy: varchar("reported_by", { length: 36 }).notNull(),
   assignedTo: varchar("assigned_to", { length: 36 }),
@@ -83,10 +83,10 @@ export const insertIncidentHistorySchema = createInsertSchema(incidentHistory).o
 export type InsertIncidentHistory = z.infer<typeof insertIncidentHistorySchema>;
 export type IncidentHistory = typeof incidentHistory.$inferSelect;
 
-// Form validation schemas
+// Formos patvirtinimo schemos
 export const createIncidentFormSchema = z.object({
-  title: z.string().min(5, "Title must be at least 5 characters"),
-  description: z.string().min(20, "Description must be at least 20 characters"),
+  title: z.string().min(5, "Pavadinimas turi būti ne trumpesnis kaip 5 simboliai"),
+  description: z.string().min(20, "Aprašymas turi būti ne trumpesnis kaip 20 simbolių"),
   category: z.enum(incidentCategories),
   severity: z.enum(severityLevels),
   affectedSystems: z.array(z.string()).optional(),
@@ -94,10 +94,10 @@ export const createIncidentFormSchema = z.object({
 
 export type CreateIncidentForm = z.infer<typeof createIncidentFormSchema>;
 
-// Safe user type (without password) for API responses
+// Saugus vartotojo tipas (be slaptažodžio) API atsakymams
 export type SafeUser = Omit<User, 'password'>;
 
-// API response types
+// API atsakymų tipai
 export interface IncidentWithDetails extends Incident {
   reporter?: SafeUser;
   assignee?: SafeUser;
