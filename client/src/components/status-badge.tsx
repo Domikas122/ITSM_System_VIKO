@@ -31,18 +31,18 @@ const statusConfig: Record<IncidentStatus, { label: string; className: string }>
 };
 
 export function StatusBadge({ status, className }: StatusBadgeProps) {
-  const config = statusConfig[status];
+  const config = statusConfig[status] || statusConfig.open;
   return (
     <Badge 
       variant="outline" 
       className={cn(
         "text-xs font-medium uppercase tracking-wide border",
-        config.className,
+        config?.className || "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 border-blue-200 dark:border-blue-800",
         className
       )}
       data-testid={`badge-status-${status}`}
     >
-      {config.label}
+      {config?.label || "UNKNOWN"}
     </Badge>
   );
 }
@@ -97,11 +97,11 @@ export function SeverityBadge({ severity, showDot = true, className }: SeverityB
 }
 
 export function SeverityDot({ severity, className }: { severity: SeverityLevel; className?: string }) {
-  const config = severityConfig[severity];
+  const config = severityConfig[severity] || severityConfig.medium;
   return (
     <span 
-      className={cn("w-2.5 h-2.5 rounded-full inline-block", config.dotColor, className)} 
-      title={config.label}
+      className={cn("w-2.5 h-2.5 rounded-full inline-block", config?.dotColor || "bg-yellow-500", className)} 
+      title={config?.label || "UNKNOWN"}
       data-testid={`dot-severity-${severity}`}
     />
   );
@@ -124,18 +124,18 @@ const categoryConfig: Record<IncidentCategory, { label: string; className: strin
 };
 
 export function CategoryBadge({ category, className }: CategoryBadgeProps) {
-  const config = categoryConfig[category];
+  const config = categoryConfig[category] || categoryConfig.other;
   return (
     <Badge 
       variant="outline" 
       className={cn(
         "text-xs font-medium uppercase border",
-        config.className,
+        config?.className || "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300 border-gray-200 dark:border-gray-800",
         className
       )}
       data-testid={`badge-category-${category}`}
     >
-      {config.label}
+      {config?.label || "UNKNOWN"}
     </Badge>
   );
 }
