@@ -50,8 +50,8 @@ export function AppSidebar() {
             <Shield className="h-5 w-5 text-primary-foreground" />
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-semibold">Incident Manager</span>
-            <span className="text-xs text-muted-foreground">IT & Cyber Security</span>
+            <span className="text-sm font-semibold">Incidentų valdymas</span>
+            <span className="text-xs text-muted-foreground">IT ir Kibernetinis saugumas</span>
           </div>
         </div>
       </SidebarHeader>
@@ -93,7 +93,7 @@ export function AppSidebar() {
                 <SidebarMenuButton asChild data-testid="nav-it-incidents">
                   <Link href="/incidents?category=it">
                     <Monitor className="h-4 w-4" />
-                    <span>IT Incidents</span>
+                    <span>IT incidentai</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -101,7 +101,7 @@ export function AppSidebar() {
                 <SidebarMenuButton asChild data-testid="nav-cyber-incidents">
                   <Link href="/incidents?category=cyber">
                     <Shield className="h-4 w-4" />
-                    <span>Cyber Incidents</span>
+                    <span>Kibernetiniai incidentai</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -136,7 +136,7 @@ export function AppSidebar() {
               onClick={() => setRole("Darbuotojas")}
               data-testid="button-role-employee"
             >
-              Employee
+              Darbuotojas
             </Button>
             <Button
               variant={role === "IT_specialistas" ? "default" : "outline"}
@@ -145,7 +145,7 @@ export function AppSidebar() {
               onClick={() => setRole("IT_specialistas")}
               data-testid="button-role-specialist"
             >
-              Specialist
+              IT_specialistas
             </Button>
           </div>
         </div>
