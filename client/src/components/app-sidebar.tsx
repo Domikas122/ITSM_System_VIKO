@@ -26,21 +26,21 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 const specialistMenuItems = [
-  { title: "Dashboard", url: "/", icon: LayoutDashboard },
-  { title: "All Incidents", url: "/incidents", icon: List },
-  { title: "New Incident", url: "/incidents/new", icon: Plus },
+  { title: "Informacinis skydelis", url: "/", icon: LayoutDashboard },
+  { title: "Visi incidentai", url: "/incidents", icon: List },
+  { title: "Nauji incidentai", url: "/incidents/new", icon: Plus },
 ];
 
 const employeeMenuItems = [
-  { title: "My Incidents", url: "/", icon: List },
-  { title: "Report Incident", url: "/incidents/new", icon: Plus },
+  { title: "Mano incidentai", url: "/", icon: List },
+  { title: "Registruoti incidentą", url: "/incidents/new", icon: Plus },
 ];
 
 export function AppSidebar() {
   const [location] = useLocation();
   const { role, setRole, currentUserName } = useRole();
   
-  const menuItems = role === "specialist" ? specialistMenuItems : employeeMenuItems;
+  const menuItems = role === "IT_specialistas" ? specialistMenuItems : employeeMenuItems;
 
   return (
     <Sidebar>
@@ -115,7 +115,7 @@ export function AppSidebar() {
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted">
-              {role === "specialist" ? (
+              {role === "IT_specialistas" ? (
                 <UserCog className="h-4 w-4 text-muted-foreground" />
               ) : (
                 <User className="h-4 w-4 text-muted-foreground" />
@@ -130,19 +130,19 @@ export function AppSidebar() {
           </div>
           <div className="flex gap-2">
             <Button
-              variant={role === "employee" ? "default" : "outline"}
+              variant={role === "Darbuotojas" ? "default" : "outline"}
               size="sm"
               className="flex-1 text-xs"
-              onClick={() => setRole("employee")}
+              onClick={() => setRole("Darbuotojas")}
               data-testid="button-role-employee"
             >
               Employee
             </Button>
             <Button
-              variant={role === "specialist" ? "default" : "outline"}
+              variant={role === "IT_specialistas" ? "default" : "outline"}
               size="sm"
               className="flex-1 text-xs"
-              onClick={() => setRole("specialist")}
+              onClick={() => setRole("IT_specialistas")}
               data-testid="button-role-specialist"
             >
               Specialist
