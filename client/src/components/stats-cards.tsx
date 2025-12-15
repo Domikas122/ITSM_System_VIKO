@@ -35,28 +35,28 @@ export function StatsCards({ stats, isLoading }: StatsCardsProps) {
 
   const statItems = [
     {
-      label: "New Incidents",
-      value: stats?.byStatus?.new ?? 0,
+      label: "Nauji Incidentai",
+      value: stats?.byStatus?.Naujas ?? 0,
       icon: AlertCircle,
       iconColor: "text-blue-500",
       bgColor: "bg-blue-50 dark:bg-blue-900/20",
     },
     {
-      label: "In Progress",
-      value: (stats?.byStatus?.assigned ?? 0) + (stats?.byStatus?.in_progress ?? 0),
+      label: "Vykdomas",
+      value: (stats?.byStatus?.Paskirtas ?? 0) + (stats?.byStatus?.Vykdomas ?? 0),
       icon: Clock,
       iconColor: "text-amber-500",
       bgColor: "bg-amber-50 dark:bg-amber-900/20",
     },
     {
-      label: "Resolved",
-      value: stats?.byStatus?.resolved ?? 0,
+      label: "Išspręsti",
+      value: stats?.byStatus?.Išspręstas ?? 0,
       icon: CheckCircle2,
       iconColor: "text-green-500",
       bgColor: "bg-green-50 dark:bg-green-900/20",
     },
     {
-      label: "Total",
+      label: "Bendrai",
       value: stats?.total ?? 0,
       icon: TrendingUp,
       iconColor: "text-primary",
@@ -108,15 +108,15 @@ export function CategoryStats({ stats, isLoading }: CategoryStatsProps) {
 
   const categories = [
     {
-      label: "IT Incidents",
-      value: stats?.byCategory?.it ?? 0,
+      label: "IT Incidentai",
+      value: stats?.byCategory?.IT ?? 0,
       icon: Monitor,
       iconColor: "text-slate-600 dark:text-slate-400",
       bgColor: "bg-slate-100 dark:bg-slate-800/50",
     },
     {
-      label: "Cyber Incidents",
-      value: stats?.byCategory?.cyber ?? 0,
+      label: "Kibernetiniai Incidentai",
+      value: stats?.byCategory?.Kibernetinis ?? 0,
       icon: Shield,
       iconColor: "text-rose-600 dark:text-rose-400",
       bgColor: "bg-rose-100 dark:bg-rose-900/30",
