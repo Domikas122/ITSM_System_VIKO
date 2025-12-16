@@ -31,9 +31,9 @@ export function AiAnalysisPanel({ incident, onAnalyze, isAnalyzing }: AiAnalysis
               )} />
             </div>
             <div>
-              <CardTitle className="text-lg">AI Analysis</CardTitle>
+              <CardTitle className="text-lg">AI analizė</CardTitle>
               <CardDescription>
-                Automated incident analysis and recommendations
+                Automatinė incidentų analizė ir rekomendacijos
               </CardDescription>
             </div>
           </div>
@@ -47,12 +47,12 @@ export function AiAnalysisPanel({ incident, onAnalyze, isAnalyzing }: AiAnalysis
             {isAnalyzing ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Analyzing...
+                Analizuojama...
               </>
             ) : (
               <>
                 <Sparkles className="mr-2 h-4 w-4" />
-                {hasAnalysis ? "Re-analyze" : "Analyze with AI"}
+                {hasAnalysis ? "Pakartotinai analizuoti" : "Analizuoti su AI"}
               </>
             )}
           </Button>
@@ -65,7 +65,7 @@ export function AiAnalysisPanel({ incident, onAnalyze, isAnalyzing }: AiAnalysis
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <Lightbulb className="h-4 w-4 text-amber-500" />
-                  <span className="text-sm font-medium">Analysis Summary</span>
+                  <span className="text-sm font-medium">Analizės santrauka</span>
                 </div>
                 <p className="text-sm text-muted-foreground whitespace-pre-wrap pl-6" data-testid="text-ai-analysis">
                   {incident.aiAnalysis}
@@ -76,7 +76,7 @@ export function AiAnalysisPanel({ incident, onAnalyze, isAnalyzing }: AiAnalysis
         ) : (
           <div className="text-center py-6">
             <p className="text-sm text-muted-foreground mb-3">
-              Click "Analyze with AI" to get automated analysis, categorization suggestions, and find similar past incidents.
+              Spustelėkite „Analizuoti su AI“, kad gautumėte automatinę analizę, kategorizavimo pasiūlymus ir rastumėte panašius ankstesnius incidentus.
             </p>
           </div>
         )}

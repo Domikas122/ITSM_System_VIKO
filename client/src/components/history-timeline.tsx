@@ -51,11 +51,11 @@ const actionConfig: Record<string, { icon: typeof Plus; color: string; bgColor: 
 };
 
 const statusLabels: Record<IncidentStatus, string> = {
-  new: "New",
-  assigned: "Assigned",
-  in_progress: "In Progress",
-  resolved: "Resolved",
-  closed: "Closed",
+  Naujas: "Naujas",
+  Paskirtas: "Paskirtas",
+  Vykdomas: "Vykdomas",
+  Išspręstas: "Išspręstas",
+  Uždarytas: "Uždarytas",
 };
 
 export function HistoryTimeline({ history }: HistoryTimelineProps) {
@@ -70,7 +70,7 @@ export function HistoryTimeline({ history }: HistoryTimelineProps) {
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground text-center py-4">
-            No history recorded yet
+            Dar nėra užregistruota istorijų.
           </p>
         </CardContent>
       </Card>
@@ -78,20 +78,20 @@ export function HistoryTimeline({ history }: HistoryTimelineProps) {
   }
 
   const getActionLabel = (entry: IncidentHistory) => {
-    if (entry.action === "created") {
-      return "Incident created";
+    if (entry.action === "Sukurtas") {
+      return "Incidentas sukurtas";
     }
-    if (entry.action === "assigned") {
-      return "Incident assigned";
+    if (entry.action === "Paskirtas") {
+      return "Incidentas paskirtas";
     }
-    if (entry.action === "status_change" && entry.previousStatus && entry.newStatus) {
-      return `Status changed from ${statusLabels[entry.previousStatus]} to ${statusLabels[entry.newStatus]}`;
+    if (entry.action === "būsena pakeista" && entry.previousStatus && entry.newStatus) {
+      return `Būsena pakeista iš ${statusLabels[entry.previousStatus]} į ${statusLabels[entry.newStatus]}`;
     }
-    if (entry.action === "resolved") {
-      return "Incident marked as resolved";
+    if (entry.action === "Išspręstas") {
+      return "Incidentas pažymėtas kaip išspręstas";
     }
-    if (entry.action === "closed") {
-      return "Incident closed";
+    if (entry.action === "Uždarytas") {
+      return "Incidentas uždarytas";
     }
     return entry.action;
   };

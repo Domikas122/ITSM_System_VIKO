@@ -35,14 +35,14 @@ interface IncidentDetailProps {
 }
 
 const statusTransitions: Record<IncidentStatus, { next: IncidentStatus; label: string; icon: typeof PlayCircle }[]> = {
-  new: [{ next: "assigned", label: "Assign to Me", icon: UserCheck }],
-  assigned: [{ next: "in_progress", label: "Start Working", icon: PlayCircle }],
-  in_progress: [{ next: "resolved", label: "Mark Resolved", icon: CheckCircle }],
-  resolved: [
-    { next: "closed", label: "Close Incident", icon: XCircle },
-    { next: "in_progress", label: "Reopen", icon: PlayCircle },
+  Naujas: [{ next: "Paskirtas", label: "Paskirtas man", icon: UserCheck }],
+  Paskirtas: [{ next: "Vykdomas", label: "Vykdomas", icon: PlayCircle }],
+  Vykdomas: [{ next: "Išspręstas", label: "Žymėti išspręstu", icon: CheckCircle }],
+  Išspręstas: [
+    { next}
+    { next: "Vykdomas", label: "Atidaryti naujai", icon: PlayCircle },
   ],
-  closed: [],
+  Uždarytas: [],
 };
 
 export function IncidentDetail({ incidentId }: IncidentDetailProps) {
@@ -50,7 +50,7 @@ export function IncidentDetail({ incidentId }: IncidentDetailProps) {
   const { role, currentUserId, currentUserName } = useRole();
   const { toast } = useToast();
   const [notes, setNotes] = useState("");
-  const isSpecialist = role === "specialist";
+  const isSpecialist = role === "IT_specialistas"
 
   const { data: incident, isLoading } = useQuery<IncidentWithDetails>({
     queryKey: ["/api/incidents", incidentId],
