@@ -39,7 +39,7 @@ const statusTransitions: Record<IncidentStatus, { next: IncidentStatus; label: s
   Paskirtas: [{ next: "Vykdomas", label: "Vykdomas", icon: PlayCircle }],
   Vykdomas: [{ next: "Išspręstas", label: "Žymėti išspręstu", icon: CheckCircle }],
   Išspręstas: [
-    { next}
+    { next: "Uždarytas", label: "Uždaryti", icon: XCircle },
     { next: "Vykdomas", label: "Atidaryti naujai", icon: PlayCircle },
   ],
   Uždarytas: [],
@@ -113,7 +113,7 @@ export function IncidentDetail({ incidentId }: IncidentDetailProps) {
     return (
       <div className="text-center py-12">
         <p className="text-muted-foreground">Incident not found</p>
-        <Button variant="link" onClick={() => setLocation("/")}>
+        <Button variant="ghost" onClick={() => setLocation("/")}>
           Go back to dashboard
         </Button>
       </div>
@@ -208,7 +208,7 @@ export function IncidentDetail({ incidentId }: IncidentDetailProps) {
                   {transitions.map((transition) => (
                     <Button
                       key={transition.next}
-                      variant={transition.next === "resolved" || transition.next === "closed" ? "default" : "outline"}
+                      variant={transition.next === "Išspręstas" || transition.next === "Uždarytas" ? "default" : "outline"}
                       onClick={() => updateStatusMutation.mutate({ status: transition.next, notes })}
                       disabled={updateStatusMutation.isPending}
                       data-testid={`button-${transition.next}`}

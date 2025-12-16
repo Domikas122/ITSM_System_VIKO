@@ -33,23 +33,23 @@ interface IncidentFiltersProps {
 }
 
 const statusLabels: Record<IncidentStatus, string> = {
-  new: "New",
-  assigned: "Assigned",
-  in_progress: "In Progress",
-  resolved: "Resolved",
-  closed: "Closed",
+  Naujas: "New",
+  Paskirtas: "Assigned",
+  Vykdomas: "In Progress",
+  Išspręstas: "Resolved",
+  Uždarytas: "Closed",
 };
 
 const categoryLabels: Record<IncidentCategory, string> = {
-  it: "IT",
-  cyber: "Cyber",
+  IT: "IT",
+  Kibernetinis: "Cyber",
 };
 
 const severityLabels: Record<SeverityLevel, string> = {
-  critical: "Critical",
-  high: "High",
-  medium: "Medium",
-  low: "Low",
+  Kritinis: "Critical",
+  Aukštas: "High",
+  Vidutinis: "Medium",
+  Žemas: "Low",
 };
 
 export function IncidentFilters({ filters, onFiltersChange }: IncidentFiltersProps) {

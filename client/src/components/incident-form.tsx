@@ -43,10 +43,10 @@ const affectedSystemOptions = [
 ];
 
 const severityOptions: { value: SeverityLevel; label: string; description: string; color: string }[] = [
-  { value: "critical", label: "Critical", description: "Immediate action required", color: "border-red-500 bg-red-50 dark:bg-red-900/20" },
-  { value: "high", label: "High", description: "Urgent attention needed", color: "border-orange-500 bg-orange-50 dark:bg-orange-900/20" },
-  { value: "medium", label: "Medium", description: "Normal priority", color: "border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20" },
-  { value: "low", label: "Low", description: "Low impact issue", color: "border-green-500 bg-green-50 dark:bg-green-900/20" },
+  { value: "Kritinis", label: "Critical", description: "Immediate action required", color: "border-red-500 bg-red-50 dark:bg-red-900/20" },
+  { value: "Aukštas", label: "High", description: "Urgent attention needed", color: "border-orange-500 bg-orange-50 dark:bg-orange-900/20" },
+  { value: "Vidutinis", label: "Medium", description: "Normal priority", color: "border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20" },
+  { value: "Žemas", label: "Low", description: "Low impact issue", color: "border-green-500 bg-green-50 dark:bg-green-900/20" },
 ];
 
 export function IncidentForm() {
@@ -60,8 +60,8 @@ export function IncidentForm() {
     defaultValues: {
       title: "",
       description: "",
-      category: "it",
-      severity: "medium",
+      category: "IT",
+      severity: "Vidutinis",
       affectedSystems: [],
     },
   });
@@ -148,10 +148,10 @@ export function IncidentForm() {
                   <FormLabel>Category</FormLabel>
                   <div className="grid grid-cols-2 gap-3">
                     <div
-                      onClick={() => field.onChange("it")}
+                      onClick={() => field.onChange("IT")}
                       className={cn(
                         "flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all",
-                        field.value === "it"
+                        field.value === "IT"
                           ? "border-primary bg-primary/5"
                           : "border-border hover:border-primary/50"
                       )}
@@ -159,7 +159,7 @@ export function IncidentForm() {
                     >
                       <div className={cn(
                         "p-2 rounded-lg",
-                        field.value === "it" ? "bg-primary text-primary-foreground" : "bg-muted"
+                        field.value === "IT" ? "bg-primary text-primary-foreground" : "bg-muted"
                       )}>
                         <Monitor className="h-5 w-5" />
                       </div>
@@ -169,10 +169,10 @@ export function IncidentForm() {
                       </div>
                     </div>
                     <div
-                      onClick={() => field.onChange("cyber")}
+                      onClick={() => field.onChange("Kibernetinis")}
                       className={cn(
                         "flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all",
-                        field.value === "cyber"
+                        field.value === "Kibernetinis"
                           ? "border-rose-500 bg-rose-50 dark:bg-rose-900/20"
                           : "border-border hover:border-rose-500/50"
                       )}
@@ -180,7 +180,7 @@ export function IncidentForm() {
                     >
                       <div className={cn(
                         "p-2 rounded-lg",
-                        field.value === "cyber" ? "bg-rose-500 text-white" : "bg-muted"
+                        field.value === "Kibernetinis" ? "bg-rose-500 text-white" : "bg-muted"
                       )}>
                         <Shield className="h-5 w-5" />
                       </div>
