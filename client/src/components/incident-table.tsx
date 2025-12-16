@@ -24,7 +24,7 @@ interface IncidentTableProps {
 
 export function IncidentTable({ incidents, isLoading, onAssign }: IncidentTableProps) {
   const { role } = useRole();
-  const isSpecialist = role === "specialist";
+  const isSpecialist = role === "IT_specialistas";
 
   if (isLoading) {
     return (
@@ -142,7 +142,7 @@ export function IncidentTable({ incidents, isLoading, onAssign }: IncidentTableP
                       <Eye className="h-4 w-4" />
                     </Button>
                   </Link>
-                  {isSpecialist && incident.status === "new" && !incident.assignedTo && (
+                  {isSpecialist && incident.status === "Naujas" && !incident.assignedTo && (
                     <Button 
                       variant="ghost" 
                       size="icon"
