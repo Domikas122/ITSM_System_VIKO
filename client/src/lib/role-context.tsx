@@ -11,12 +11,11 @@ interface RoleContextType {
 const RoleContext = createContext<RoleContextType | undefined>(undefined);
 
 export function RoleProvider({ children }: { children: React.ReactNode }) {
-  const [role, setRole] = useState<UserRole>("specialist");
+  const [role, setRole] = useState<UserRole>("IT_specialistas");
   
   // Mock current user - in a real app this would come from auth
-  const currentUserId = role === "specialist" ? "specialist-1" : "employee-1";
-  const currentUserName = role === "specialist" ? "John Smith" : "Jane Doe";
-
+  const currentUserId = role === "IT_specialistas" ? "specialist-1" : "employee-1";
+  const currentUserName = role === "IT_specialistas" ? "Dominykas Kopijevas" : "Ona Kepenienė";
   return (
     <RoleContext.Provider value={{ role, setRole, currentUserId, currentUserName }}>
       {children}
