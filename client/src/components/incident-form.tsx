@@ -34,19 +34,19 @@ import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 
 const affectedSystemOptions = [
-  { id: "email", label: "Email System", icon: Server },
-  { id: "network", label: "Network", icon: Network },
-  { id: "database", label: "Database", icon: Database },
-  { id: "cloud", label: "Cloud Services", icon: Cloud },
-  { id: "workstation", label: "Workstations", icon: Laptop },
-  { id: "servers", label: "Servers", icon: Server },
+  { id: "email", label: "El. pašto sistema", icon: Server },
+  { id: "network", label: "Tinklas", icon: Network },
+  { id: "database", label: "Duomenų bazė", icon: Database },
+  { id: "cloud", label: "Debesų paslaugos", icon: Cloud },
+  { id: "workstation", label: "Darbalaukiai", icon: Laptop },
+  { id: "servers", label: "Serveriai", icon: Server },
 ];
 
 const severityOptions: { value: SeverityLevel; label: string; description: string; color: string }[] = [
-  { value: "Kritinis", label: "Critical", description: "Immediate action required", color: "border-red-500 bg-red-50 dark:bg-red-900/20" },
-  { value: "Aukštas", label: "High", description: "Urgent attention needed", color: "border-orange-500 bg-orange-50 dark:bg-orange-900/20" },
-  { value: "Vidutinis", label: "Medium", description: "Normal priority", color: "border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20" },
-  { value: "Žemas", label: "Low", description: "Low impact issue", color: "border-green-500 bg-green-50 dark:bg-green-900/20" },
+  { value: "Kritinis", label: "Kritinis", description: "Reikia imtis neatidėliotinų veiksmų", color: "border-red-500 bg-red-50 dark:bg-red-900/20" },
+  { value: "Aukštas", label: "Aukštas", description: "Reikia skubios pagalbos", color: "border-orange-500 bg-orange-50 dark:bg-orange-900/20" },
+  { value: "Vidutinis", label: "Vidutinis", description: "Įprastas prioritetas", color: "border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20" },
+  { value: "Žemas", label: "Žemas", description: "Mažas poveikis", color: "border-green-500 bg-green-50 dark:bg-green-900/20" },
 ];
 
 export function IncidentForm() {
@@ -79,15 +79,15 @@ export function IncidentForm() {
       queryClient.invalidateQueries({ queryKey: ["/api/incidents"] });
       queryClient.invalidateQueries({ queryKey: ["/api/incidents/stats"] });
       toast({
-        title: "Incident created",
-        description: "Your incident has been submitted successfully.",
+        title: "Incidentas sukurtas",
+        description: "Jūsų incidentas buvo sėkmingai pateiktas.",
       });
       setLocation(`/incidents/${data.id}`);
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to create incident",
+        title: "Klaida",
+        description: error.message || "Nepavyko sukurti incidento",
         variant: "destructive",
       });
     },
@@ -113,7 +113,7 @@ export function IncidentForm() {
           Report New Incident
         </CardTitle>
         <CardDescription>
-          Provide detailed information about the IT or cyber security incident.
+          Pateikite išsamią informaciją apie IT arba kibernetinio saugumo incidentą.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -124,16 +124,16 @@ export function IncidentForm() {
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Incident Title</FormLabel>
+                  <FormLabel>Incidento pavadinimas</FormLabel>
                   <FormControl>
                     <Input 
-                      placeholder="Brief description of the issue" 
+                      placeholder="Trumpas problemos aprašymas" 
                       {...field} 
                       data-testid="input-title"
                     />
                   </FormControl>
                   <FormDescription>
-                    A concise summary of the incident (minimum 5 characters)
+                    Trumpa incidento santrauka (bent 5 simboliai)
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -145,7 +145,7 @@ export function IncidentForm() {
               name="category"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Category</FormLabel>
+                  <FormLabel>Kategorija</FormLabel>
                   <div className="grid grid-cols-2 gap-3">
                     <div
                       onClick={() => field.onChange("IT")}
@@ -164,8 +164,8 @@ export function IncidentForm() {
                         <Monitor className="h-5 w-5" />
                       </div>
                       <div>
-                        <p className="font-medium">IT Incident</p>
-                        <p className="text-xs text-muted-foreground">Hardware, software, network issues</p>
+                        <p className="font-medium">IT Incidentas</p>
+                        <p className="text-xs text-muted-foreground">Aparatinė įranga, programinė įranga, tinklo problemos</p>
                       </div>
                     </div>
                     <div
@@ -185,8 +185,8 @@ export function IncidentForm() {
                         <Shield className="h-5 w-5" />
                       </div>
                       <div>
-                        <p className="font-medium">Cyber Security</p>
-                        <p className="text-xs text-muted-foreground">Security threats, breaches, attacks</p>
+                        <p className="font-medium">Kibernetinis saugumas</p>
+                        <p className="text-xs text-muted-foreground">Saugumo grėsmės, pažeidimai, atakos</p>
                       </div>
                     </div>
                   </div>
@@ -200,7 +200,7 @@ export function IncidentForm() {
               name="severity"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Severity Level</FormLabel>
+                  <FormLabel>Lygis</FormLabel>
                   <RadioGroup
                     onValueChange={field.onChange}
                     defaultValue={field.value}
@@ -238,17 +238,17 @@ export function IncidentForm() {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Detailed Description</FormLabel>
+                  <FormLabel>Išsamus aprašymas</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Describe the incident in detail: what happened, when it started, what you've tried..."
+                      placeholder="Išsamiai aprašykite incidentą: kas nutiko, kada prasidėjo, ką bandėte..."
                       className="min-h-32 resize-none"
                       {...field}
                       data-testid="input-description"
                     />
                   </FormControl>
                   <FormDescription>
-                    Include as much detail as possible (minimum 20 characters)
+                    Įtraukite kuo daugiau detalių (mažiausiai 20 simbolių)
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -256,7 +256,7 @@ export function IncidentForm() {
             />
 
             <div className="space-y-3">
-              <Label>Affected Systems (Optional)</Label>
+              <Label>Paveiktos sistemos (neprivaloma)</Label>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {affectedSystemOptions.map((system) => (
                   <div
@@ -289,7 +289,7 @@ export function IncidentForm() {
                 className="flex-1"
                 data-testid="button-cancel"
               >
-                Cancel
+                Atšaukti
               </Button>
               <Button
                 type="submit"
@@ -300,7 +300,7 @@ export function IncidentForm() {
                 {createMutation.isPending && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
-                Submit Incident
+                Pateikti incidentą
               </Button>
             </div>
           </form>
