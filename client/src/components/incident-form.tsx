@@ -59,7 +59,7 @@ export function IncidentForm() {
     resolver: zodResolver(createIncidentFormSchema),
     defaultValues: {
       title: "",
-      description: "",
+      description: "Aprašymas",
       category: "IT",
       severity: "Vidutinis",
       affectedSystems: [],
@@ -110,7 +110,7 @@ export function IncidentForm() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <AlertTriangle className="h-5 w-5 text-primary" />
-          Report New Incident
+          Pranešti apie naują incidentą
         </CardTitle>
         <CardDescription>
           Pateikite išsamią informaciją apie IT arba kibernetinio saugumo incidentą.
