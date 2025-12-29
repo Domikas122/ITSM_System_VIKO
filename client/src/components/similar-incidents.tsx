@@ -16,12 +16,12 @@ export function SimilarIncidents({ incidents }: SimilarIncidentsProps) {
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center gap-2">
             <Search className="h-4 w-4 text-muted-foreground" />
-            Similar Incidents
+            Panašūs incidentai
           </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground text-center py-4">
-            No similar incidents found
+            Nėra panašių incidentų
           </p>
         </CardContent>
       </Card>
@@ -37,7 +37,7 @@ export function SimilarIncidents({ incidents }: SimilarIncidentsProps) {
       <CardHeader className="pb-3">
         <CardTitle className="text-lg flex items-center gap-2">
           <Search className="h-4 w-4 text-muted-foreground" />
-          Similar Incidents ({incidents.length})
+          Panašūs incidentai ({incidents.length})
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -74,7 +74,7 @@ export function SimilarIncidents({ incidents }: SimilarIncidentsProps) {
               {incident.resolvedAt && (
                 <div className="flex items-center gap-1 mt-2 text-xs text-green-600 dark:text-green-400">
                   <CheckCircle2 className="h-3 w-3" />
-                  <span>Resolved</span>
+                  <span>Išspręstas</span>
                 </div>
               )}
             </div>

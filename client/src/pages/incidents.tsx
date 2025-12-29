@@ -20,7 +20,7 @@ export default function Incidents() {
   const [filters, setFilters] = useState<Filters>({
     category: categoryParam ? [categoryParam] : undefined,
   });
-  const isSpecialist = role === "specialist";
+  const isSpecialist = role === "IT_specialistas";
 
   const buildQueryString = (filters: Filters) => {
     const queryParams = new URLSearchParams();
@@ -51,14 +51,14 @@ export default function Incidents() {
       queryClient.invalidateQueries({ queryKey: ["/api/incidents"] });
       queryClient.invalidateQueries({ queryKey: ["/api/incidents/stats"] });
       toast({
-        title: "Incident assigned",
-        description: "The incident has been assigned to you.",
+        title: "Priskirtas incidentas",
+        description: "Incidentas jums buvo sėkmingai paskirtas.",
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to assign incident",
+        title: "Klaida",
+        description: error.message || "Nepavyko paskirti incidento",
         variant: "destructive",
       });
     },
@@ -73,9 +73,9 @@ export default function Incidents() {
   };
 
   const getPageTitle = () => {
-    if (categoryParam === "it") return "IT Incidents";
-    if (categoryParam === "cyber") return "Cyber Security Incidents";
-    return "All Incidents";
+    if (categoryParam === "IT") return "IT incidentai";
+    if (categoryParam === "Kibernetinis") return "Kibernetinio saugumo incidentai";
+    return "Visi incidentai";
   };
 
   return (
@@ -106,7 +106,7 @@ export default function Incidents() {
           <Link href="/incidents/new">
             <Button data-testid="button-new-incident">
               <Plus className="h-4 w-4 mr-2" />
-              New Incident
+              Naujas incidentas
             </Button>
           </Link>
         </div>

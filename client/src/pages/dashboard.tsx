@@ -15,7 +15,7 @@ export default function Dashboard() {
   const { role, currentUserId, currentUserName } = useRole();
   const { toast } = useToast();
   const [filters, setFilters] = useState<Filters>({});
-  const isSpecialist = role === "specialist";
+  const isSpecialist = role === "IT_specialistas";
 
   const buildQueryString = (filters: Filters) => {
     const params = new URLSearchParams();
@@ -50,14 +50,14 @@ export default function Dashboard() {
       queryClient.invalidateQueries({ queryKey: ["/api/incidents"] });
       queryClient.invalidateQueries({ queryKey: ["/api/incidents/stats"] });
       toast({
-        title: "Incident assigned",
-        description: "The incident has been assigned to you.",
+        title: "Paskirtas incidentas",
+        description: "Incidentas jums buvo sėkmingai paskirtas.",
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to assign incident",
+        title: "Klaida",
+        description: error.message || "Nepavyko paskirti incidento",
         variant: "destructive",
       });
     },
@@ -76,12 +76,12 @@ export default function Dashboard() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold" data-testid="text-page-title">
-            {isSpecialist ? "Incident Dashboard" : "My Incidents"}
+            {isSpecialist ? "Incidentų skydelis" : "Mano incidentai"}
           </h1>
           <p className="text-muted-foreground text-sm mt-1">
             {isSpecialist 
-              ? "Manage and monitor all IT and cyber security incidents" 
-              : "View and track your reported incidents"}
+              ? "Valdykite ir stebėkite visus IT ir kibernetinio saugumo incidentus" 
+              : "Peržiūrėkite ir sekite savo praneštus incidentus"}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -96,7 +96,7 @@ export default function Dashboard() {
           <Link href="/incidents/new">
             <Button data-testid="button-new-incident">
               <Plus className="h-4 w-4 mr-2" />
-              {isSpecialist ? "New Incident" : "Report Incident"}
+              {isSpecialist ? "Naujas incidentas" : "Pranešti apie incidentą"}
             </Button>
           </Link>
         </div>

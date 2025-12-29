@@ -7,7 +7,7 @@ export default function IncidentDetailPage() {
   if (!params.id) {
     return (
       <div className="p-6 text-center">
-        <p className="text-muted-foreground">Invalid incident ID</p>
+        <p className="text-muted-foreground">Neteisingas incidento ID</p>
       </div>
     );
   }
