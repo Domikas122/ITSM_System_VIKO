@@ -19,13 +19,13 @@ export default function Dashboard() {
 
   const buildQueryString = (filters: Filters) => {
     const params = new URLSearchParams();
-    if (filters.status?.length) params.set("status", filters.status.join(","));
-    if (filters.category?.length) params.set("category", filters.category.join(","));
-    if (filters.severity?.length) params.set("severity", filters.severity.join(","));
-    if (filters.dateFrom) params.set("dateFrom", filters.dateFrom);
-    if (filters.dateTo) params.set("dateTo", filters.dateTo);
-    if (filters.search) params.set("search", filters.search);
-    if (!isSpecialist) params.set("reportedBy", currentUserId);
+    if (filters.status?.length) params.set("Būklė", filters.status.join(","));
+    if (filters.category?.length) params.set("Kategorija", filters.category.join(","));
+    if (filters.severity?.length) params.set("Sunkumas", filters.severity.join(","));
+    if (filters.dateFrom) params.set("dataNuo", filters.dateFrom);
+    if (filters.dateTo) params.set("dataIki", filters.dateTo);
+    if (filters.search) params.set("paieška", filters.search);
+    if (!isSpecialist) params.set("pranešė", currentUserId);
     return params.toString();
   };
 
