@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Link, useSearch } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -62,9 +62,9 @@ export default function Incidents() {
     },
   });
 
-  const handleFiltersChange = (newFilters: Filters) => {
+  const handleFiltersChange = useCallback((newFilters: Filters) => {
     setFilters(newFilters);
-  };
+  }, []);
 
   const handleAssign = (incidentId: string) => {
     assignMutation.mutate(incidentId);
