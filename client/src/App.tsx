@@ -13,6 +13,7 @@ import Incidents from "@/pages/incidents";
 import NewIncident from "@/pages/new-incident";
 import IncidentDetailPage from "@/pages/incident-detail";
 import NotFound from "@/pages/not-found";
+import { useMemo } from "react";
 
 function Router() {
   return (
@@ -27,17 +28,17 @@ function Router() {
 }
 
 function App() {
-  const style = {
+  const style = useMemo(() => ({
     "--sidebar-width": "16rem",
     "--sidebar-width-icon": "3rem",
-  };
+  } as React.CSSProperties), []);
 
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="light" storageKey="incident-ui-theme">
         <RoleProvider>
           <TooltipProvider>
-            <SidebarProvider style={style as React.CSSProperties}>
+            <SidebarProvider style={style}>
               <div className="flex h-screen w-full">
                 <AppSidebar />
                 <div className="flex flex-col flex-1 overflow-hidden">

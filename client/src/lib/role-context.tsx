@@ -22,8 +22,16 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
     role === "IT_specialistas" ? "Dominykas Kopijevas" : "Ona Kepenienė",
     [role]
   );
+  
+  const value = useMemo(() => ({
+    role,
+    setRole,
+    currentUserId,
+    currentUserName
+  }), [role, currentUserId, currentUserName]);
+  
   return (
-    <RoleContext.Provider value={{ role, setRole, currentUserId, currentUserName }}>
+    <RoleContext.Provider value={value}>
       {children}
     </RoleContext.Provider>
   );
