@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -61,56 +61,69 @@ export function IncidentFilters({ filters, onFiltersChange }: IncidentFiltersPro
     filters.dateTo ? new Date(filters.dateTo) : undefined
   );
 
-  const handleSearchSubmit = () => {
-    onFiltersChange({ ...filters, search: searchValue || undefined });
-  };
+  // Sync local state with props when filters change externally
+  useEffect(() => {
+    setSearchValue(filters.search || "");
+  }, [filters.search]);
 
-  const handleStatusChange = (value: string) => {
+  useEffect(() => {
+    setDateFrom(filters.dateFrom ? new Date(filters.dateFrom) : undefined);
+  }, [filters.dateFrom]);
+
+  useEffect(() => {
+    setDateTo(filters.dateTo ? new Date(filters.dateTo) : undefined);
+  }, [filters.dateTo]);
+
+  const handleSearchSubmit = useCallback(() => {
+    onFiltersChange({ ...filters, search: searchValue || undefined });
+  }, [searchValue, onFiltersChange]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleStatusChange = useCallback((value: string) => {
     if (value === "all") {
       onFiltersChange({ ...filters, status: undefined });
     } else {
       onFiltersChange({ ...filters, status: [value as IncidentStatus] });
     }
-  };
+  }, [onFiltersChange]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleCategoryChange = (value: string) => {
+  const handleCategoryChange = useCallback((value: string) => {
     if (value === "all") {
       onFiltersChange({ ...filters, category: undefined });
     } else {
       onFiltersChange({ ...filters, category: [value as IncidentCategory] });
     }
-  };
+  }, [onFiltersChange]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleSeverityChange = (value: string) => {
+  const handleSeverityChange = useCallback((value: string) => {
     if (value === "all") {
       onFiltersChange({ ...filters, severity: undefined });
     } else {
       onFiltersChange({ ...filters, severity: [value as SeverityLevel] });
     }
-  };
+  }, [onFiltersChange]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleDateFromChange = (date: Date | undefined) => {
+  const handleDateFromChange = useCallback((date: Date | undefined) => {
     setDateFrom(date);
     onFiltersChange({ 
       ...filters, 
       dateFrom: date ? format(date, "yyyy-MM-dd") : undefined 
     });
-  };
+  }, [onFiltersChange]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleDateToChange = (date: Date | undefined) => {
+  const handleDateToChange = useCallback((date: Date | undefined) => {
     setDateTo(date);
     onFiltersChange({ 
       ...filters, 
       dateTo: date ? format(date, "yyyy-MM-dd") : undefined 
     });
-  };
+  }, [onFiltersChange]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setSearchValue("");
     setDateFrom(undefined);
     setDateTo(undefined);
     onFiltersChange({});
-  };
+  }, [onFiltersChange]);
 
   const activeFilterCount = [
     filters.status?.length,
