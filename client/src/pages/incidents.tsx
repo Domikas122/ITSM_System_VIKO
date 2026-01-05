@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Link, useSearch } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,7 @@ export default function Incidents() {
   });
   const isSpecialist = role === "IT_specialistas";
 
-  const buildQueryString = (filters: Filters) => {
+  const queryString = useMemo(() => {
     const queryParams = new URLSearchParams();
     if (filters.status?.length) queryParams.set("status", filters.status.join(","));
     if (filters.category?.length) queryParams.set("category", filters.category.join(","));
@@ -32,9 +32,7 @@ export default function Incidents() {
     if (filters.search) queryParams.set("search", filters.search);
     if (!isSpecialist) queryParams.set("reportedBy", currentUserId);
     return queryParams.toString();
-  };
-
-  const queryString = buildQueryString(filters);
+  }, [filters, isSpecialist, currentUserId]);
   const { data: incidents, isLoading, refetch } = useQuery<Incident[]>({
     queryKey: ["/api/incidents", queryString],
   });

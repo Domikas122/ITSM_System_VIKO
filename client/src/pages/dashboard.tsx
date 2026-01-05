@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,11 @@ export default function Dashboard() {
   const [filters, setFilters] = useState<Filters>({});
   const isSpecialist = role === "IT_specialistas";
 
-  const buildQueryString = (filters: Filters) => {
+  const { data: stats, isLoading: statsLoading } = useQuery<DashboardStats>({
+    queryKey: ["/api/incidents/stats"],
+  });
+
+  const queryString = useMemo(() => {
     const params = new URLSearchParams();
     if (filters.status?.length) params.set("Būklė", filters.status.join(","));
     if (filters.category?.length) params.set("Kategorija", filters.category.join(","));
@@ -27,13 +31,7 @@ export default function Dashboard() {
     if (filters.search) params.set("paieška", filters.search);
     if (!isSpecialist) params.set("pranešė", currentUserId);
     return params.toString();
-  };
-
-  const { data: stats, isLoading: statsLoading } = useQuery<DashboardStats>({
-    queryKey: ["/api/incidents/stats"],
-  });
-
-  const queryString = buildQueryString(filters);
+  }, [filters, isSpecialist, currentUserId]);
   const { data: incidents, isLoading: incidentsLoading, refetch } = useQuery<Incident[]>({
     queryKey: ["/api/incidents", queryString],
   });
