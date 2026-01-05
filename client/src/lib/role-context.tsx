@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useMemo } from "react";
 import type { UserRole } from "@shared/schema";
 
 interface RoleContextType {
@@ -14,8 +14,14 @@ export function RoleProvider({ children }: { children: React.ReactNode }) {
   const [role, setRole] = useState<UserRole>("IT_specialistas");
   
   // Mock current user - in a real app this would come from auth
-  const currentUserId = role === "IT_specialistas" ? "specialist-1" : "employee-1";
-  const currentUserName = role === "IT_specialistas" ? "Dominykas Kopijevas" : "Ona Kepenienė";
+  const currentUserId = useMemo(() => 
+    role === "IT_specialistas" ? "specialist-1" : "employee-1",
+    [role]
+  );
+  const currentUserName = useMemo(() => 
+    role === "IT_specialistas" ? "Dominykas Kopijevas" : "Ona Kepenienė",
+    [role]
+  );
   return (
     <RoleContext.Provider value={{ role, setRole, currentUserId, currentUserName }}>
       {children}
