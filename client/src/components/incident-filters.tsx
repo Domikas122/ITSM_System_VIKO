@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -53,6 +53,13 @@ const severityLabels: Record<SeverityLevel, string> = {
 };
 
 export function IncidentFilters({ filters, onFiltersChange }: IncidentFiltersProps) {
+  const filtersRef = useRef(filters);
+  
+  // Always keep ref updated
+  useEffect(() => {
+    filtersRef.current = filters;
+  }, [filters]);
+
   const [searchValue, setSearchValue] = useState(filters.search || "");
   const [dateFrom, setDateFrom] = useState<Date | undefined>(
     filters.dateFrom ? new Date(filters.dateFrom) : undefined
@@ -61,62 +68,49 @@ export function IncidentFilters({ filters, onFiltersChange }: IncidentFiltersPro
     filters.dateTo ? new Date(filters.dateTo) : undefined
   );
 
-  // Sync local state with props when filters change externally
-  useEffect(() => {
-    setSearchValue(filters.search || "");
-  }, [filters.search]);
-
-  useEffect(() => {
-    setDateFrom(filters.dateFrom ? new Date(filters.dateFrom) : undefined);
-  }, [filters.dateFrom]);
-
-  useEffect(() => {
-    setDateTo(filters.dateTo ? new Date(filters.dateTo) : undefined);
-  }, [filters.dateTo]);
-
   const handleSearchSubmit = useCallback(() => {
-    onFiltersChange({ ...filters, search: searchValue || undefined });
-  }, [searchValue, onFiltersChange]); // eslint-disable-line react-hooks/exhaustive-deps
+    onFiltersChange({ ...filtersRef.current, search: searchValue || undefined });
+  }, [searchValue, onFiltersChange]);
 
   const handleStatusChange = useCallback((value: string) => {
     if (value === "all") {
-      onFiltersChange({ ...filters, status: undefined });
+      onFiltersChange({ ...filtersRef.current, status: undefined });
     } else {
-      onFiltersChange({ ...filters, status: [value as IncidentStatus] });
+      onFiltersChange({ ...filtersRef.current, status: [value as IncidentStatus] });
     }
-  }, [onFiltersChange]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [onFiltersChange]);
 
   const handleCategoryChange = useCallback((value: string) => {
     if (value === "all") {
-      onFiltersChange({ ...filters, category: undefined });
+      onFiltersChange({ ...filtersRef.current, category: undefined });
     } else {
-      onFiltersChange({ ...filters, category: [value as IncidentCategory] });
+      onFiltersChange({ ...filtersRef.current, category: [value as IncidentCategory] });
     }
-  }, [onFiltersChange]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [onFiltersChange]);
 
   const handleSeverityChange = useCallback((value: string) => {
     if (value === "all") {
-      onFiltersChange({ ...filters, severity: undefined });
+      onFiltersChange({ ...filtersRef.current, severity: undefined });
     } else {
-      onFiltersChange({ ...filters, severity: [value as SeverityLevel] });
+      onFiltersChange({ ...filtersRef.current, severity: [value as SeverityLevel] });
     }
-  }, [onFiltersChange]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [onFiltersChange]);
 
   const handleDateFromChange = useCallback((date: Date | undefined) => {
     setDateFrom(date);
     onFiltersChange({ 
-      ...filters, 
+      ...filtersRef.current, 
       dateFrom: date ? format(date, "yyyy-MM-dd") : undefined 
     });
-  }, [onFiltersChange]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [onFiltersChange]);
 
   const handleDateToChange = useCallback((date: Date | undefined) => {
     setDateTo(date);
     onFiltersChange({ 
-      ...filters, 
+      ...filtersRef.current, 
       dateTo: date ? format(date, "yyyy-MM-dd") : undefined 
     });
-  }, [onFiltersChange]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [onFiltersChange]);
 
   const clearFilters = useCallback(() => {
     setSearchValue("");
