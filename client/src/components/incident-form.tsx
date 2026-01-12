@@ -30,7 +30,6 @@ import { useRole } from "@/lib/role-context";
 import { createIncidentFormSchema, type CreateIncidentForm, type SeverityLevel } from "@shared/schema";
 import { Loader2, AlertTriangle, Shield, Monitor, Server, Database, Cloud, Network, Laptop } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 
 const affectedSystemOptions = [
@@ -53,7 +52,6 @@ export function IncidentForm() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const { currentUserId } = useRole();
-  const [selectedSystems, setSelectedSystems] = useState<string[]>([]);
 
   const form = useForm<CreateIncidentForm>({
     resolver: zodResolver(createIncidentFormSchema),
@@ -70,7 +68,6 @@ export function IncidentForm() {
     mutationFn: async (data: CreateIncidentForm) => {
       const response = await apiRequest("POST", "/api/incidents", {
         ...data,
-        affectedSystems: selectedSystems,
         reportedBy: currentUserId,
       });
       return response.json();
@@ -95,14 +92,6 @@ export function IncidentForm() {
 
   const onSubmit = (data: CreateIncidentForm) => {
     createMutation.mutate(data);
-  };
-
-  const toggleSystem = (systemId: string) => {
-    setSelectedSystems((prev) =>
-      prev.includes(systemId)
-        ? prev.filter((id) => id !== systemId)
-        : [...prev, systemId]
-    );
   };
 
   return (
@@ -255,33 +244,46 @@ export function IncidentForm() {
               )}
             />
 
-            <div className="space-y-3">
-              <Label>Paveiktos sistemos (neprivaloma)</Label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {affectedSystemOptions.map((system) => (
-                  <button
-                    key={system.id}
-                    type="button"
-                    onClick={() => toggleSystem(system.id)}
-                    className={cn(
-                      "flex items-center gap-2 p-2.5 rounded-lg border cursor-pointer transition-all",
-                      selectedSystems.includes(system.id)
-                        ? "border-primary bg-primary/5"
-                        : "border-border hover:bg-muted/50"
-                    )}
-                    data-testid={`system-${system.id}`}
-                  >
-                    <Checkbox
-                      checked={selectedSystems.includes(system.id)}
-                      onCheckedChange={() => toggleSystem(system.id)}
-                      className="pointer-events-auto"
-                    />
-                    <system.icon className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">{system.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
+            <FormField
+              control={form.control}
+              name="affectedSystems"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Paveiktos sistemos (neprivaloma)</FormLabel>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {affectedSystemOptions.map((system) => (
+                      <button
+                        key={system.id}
+                        type="button"
+                        onClick={() => {
+                          const current = field.value || [];
+                          field.onChange(
+                            current.includes(system.id)
+                              ? current.filter((id: string) => id !== system.id)
+                              : [...current, system.id]
+                          );
+                        }}
+                        className={cn(
+                          "flex items-center gap-2 p-2.5 rounded-lg border cursor-pointer transition-all",
+                          (field.value || []).includes(system.id)
+                            ? "border-primary bg-primary/5"
+                            : "border-border hover:bg-muted/50"
+                        )}
+                        data-testid={`system-${system.id}`}
+                      >
+                        <Checkbox
+                          checked={(field.value || []).includes(system.id)}
+                          className="pointer-events-none"
+                        />
+                        <system.icon className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm">{system.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <div className="flex gap-3 pt-4">
               <Button
