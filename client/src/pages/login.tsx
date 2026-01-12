@@ -128,22 +128,6 @@ export default function Login() {
               {loginMutation.isPending ? "Jungiamasi..." : "Prisijungti"}
             </Button>
           </form>
-
-          <div className="mt-6 pt-6 border-t">
-            <div className="text-sm text-muted-foreground space-y-2">
-              <p className="font-semibold text-center mb-3">Demo prisijungimo duomenys:</p>
-              <div className="space-y-1 text-xs">
-                <p><strong>IT Specialistas:</strong></p>
-                <p>• Naudotojas: <code className="bg-muted px-1 py-0.5 rounded">domikas122</code></p>
-                <p>• Slaptažodis: <code className="bg-muted px-1 py-0.5 rounded">mkl123MKL</code></p>
-              </div>
-              <div className="space-y-1 text-xs mt-3">
-                <p><strong>Darbuotojas:</strong></p>
-                <p>• Naudotojas: <code className="bg-muted px-1 py-0.5 rounded">var.pav</code></p>
-                <p>• Slaptažodis: <code className="bg-muted px-1 py-0.5 rounded">abc123ABC</code></p>
-              </div>
-            </div>
-          </div>
         </CardContent>
       </Card>
       </div>
