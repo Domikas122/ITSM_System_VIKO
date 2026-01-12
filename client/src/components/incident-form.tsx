@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
+import { useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -31,6 +32,7 @@ import { createIncidentFormSchema, type CreateIncidentForm, type SeverityLevel }
 import { Loader2, AlertTriangle, Shield, Monitor, Server, Database, Cloud, Network, Laptop } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
+import type { FieldValues, UseFormSetValue } from "react-hook-form";
 
 const affectedSystemOptions = [
   { id: "email", label: "El. pašto sistema", icon: Server },
@@ -47,6 +49,36 @@ const severityOptions: { value: SeverityLevel; label: string; description: strin
   { value: "Vidutinis", label: "Vidutinis", description: "Įprastas prioritetas", color: "border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20" },
   { value: "Žemas", label: "Žemas", description: "Mažas poveikis", color: "border-green-500 bg-green-50 dark:bg-green-900/20" },
 ];
+
+interface SystemButtonProps {
+  system: typeof affectedSystemOptions[0];
+  isSelected: boolean;
+  onChange: (id: string) => void;
+}
+
+function SystemButton({ system, isSelected, onChange }: SystemButtonProps) {
+  return (
+    <button
+      key={system.id}
+      type="button"
+      onClick={() => onChange(system.id)}
+      className={cn(
+        "flex items-center gap-2 p-2.5 rounded-lg border cursor-pointer transition-all",
+        isSelected
+          ? "border-primary bg-primary/5"
+          : "border-border hover:bg-muted/50"
+      )}
+      data-testid={`system-${system.id}`}
+    >
+      <Checkbox
+        checked={isSelected}
+        className="pointer-events-none"
+      />
+      <system.icon className="h-4 w-4 text-muted-foreground" />
+      <span className="text-sm">{system.label}</span>
+    </button>
+  );
+}
 
 export function IncidentForm() {
   const [, setLocation] = useLocation();
@@ -252,32 +284,19 @@ export function IncidentForm() {
                   <FormLabel>Paveiktos sistemos (neprivaloma)</FormLabel>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {affectedSystemOptions.map((system) => (
-                      <button
+                      <SystemButton
                         key={system.id}
-                        type="button"
-                        onClick={() => {
+                        system={system}
+                        isSelected={(field.value || []).includes(system.id)}
+                        onChange={(id) => {
                           const current = field.value || [];
                           field.onChange(
-                            current.includes(system.id)
-                              ? current.filter((id: string) => id !== system.id)
-                              : [...current, system.id]
+                            current.includes(id)
+                              ? current.filter((i: string) => i !== id)
+                              : [...current, id]
                           );
                         }}
-                        className={cn(
-                          "flex items-center gap-2 p-2.5 rounded-lg border cursor-pointer transition-all",
-                          (field.value || []).includes(system.id)
-                            ? "border-primary bg-primary/5"
-                            : "border-border hover:bg-muted/50"
-                        )}
-                        data-testid={`system-${system.id}`}
-                      >
-                        <Checkbox
-                          checked={(field.value || []).includes(system.id)}
-                          className="pointer-events-none"
-                        />
-                        <system.icon className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm">{system.label}</span>
-                      </button>
+                      />
                     ))}
                   </div>
                   <FormMessage />
