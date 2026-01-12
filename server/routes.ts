@@ -2,7 +2,6 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { analyzeIncident } from "./openai";
-import { sendNewIncidentNotification, sendIncidentAssignedNotification } from "./email";
 import { 
   insertIncidentSchema,
   type IncidentStatus,
@@ -82,25 +81,6 @@ export async function registerRoutes(
 
       const incident = await storage.createIncident(validation.data);
       
-      // Send email notifications to all IT specialists
-      try {
-        const specialists = await storage.getUsersByRole("IT_specialistas");
-        const reporter = await storage.getUser(validation.data.reportedBy);
-        
-        for (const specialist of specialists) {
-          await sendNewIncidentNotification(
-            specialist.email || specialist.username,
-            incident.id,
-            incident.title,
-            incident.category,
-            incident.severity,
-            reporter?.displayName || validation.data.reportedBy
-          );
-        }
-      } catch (emailError) {
-        console.error("Failed to send email notifications:", emailError);
-        // Don't fail the request if email fails
-      }
       
       res.status(201).json(incident);
     } catch (error) {
