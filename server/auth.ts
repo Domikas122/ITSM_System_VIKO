@@ -12,6 +12,8 @@ declare module "express-session" {
 
 // Simple session middleware
 export function setupAuth(app: Express) {
+  const isProduction = process.env.NODE_ENV === "production";
+  
   app.use(
     session({
       secret: process.env.SESSION_SECRET || "incident-pilot-secret-key-change-in-production",
@@ -20,8 +22,9 @@ export function setupAuth(app: Express) {
       cookie: {
         maxAge: 24 * 60 * 60 * 1000, // 24 hours
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
+        secure: isProduction, // HTTPS only in production
+        sameSite: isProduction ? "strict" : "lax",
+        domain: process.env.COOKIE_DOMAIN, // Set this for your domain
       },
     })
   );

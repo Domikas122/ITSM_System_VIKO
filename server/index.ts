@@ -90,7 +90,10 @@ app.use((req, res, next) => {
   // tai tinka tiek API, tiek klientui.
   // vienintelis port'as, kuris nėra apsaugotas ugniasiene..
   const port = parseInt(process.env.PORT || "8080", 10);
-  httpServer.listen(port, "localhost", () => {
-    log(`serving on http://localhost:${port}`);
+  const host = process.env.HOST || "0.0.0.0";
+  
+  httpServer.listen(port, host, () => {
+    const displayUrl = process.env.PUBLIC_URL || "http://zybis.filharmonija.local:8080";
+    log(`serving on ${displayUrl}`);
   });
 })();
