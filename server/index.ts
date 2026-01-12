@@ -7,6 +7,9 @@ import { setupAuth, registerAuthRoutes } from "./auth";
 const app = express();
 const httpServer = createServer(app);
 
+// Trust Fly.io proxy for secure cookies
+app.set('trust proxy', 1);
+
 declare module "http" {
   interface IncomingMessage {
     rawBody: unknown;
