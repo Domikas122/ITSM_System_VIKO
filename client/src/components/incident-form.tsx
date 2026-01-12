@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
-import { useCallback, memo } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -50,43 +50,13 @@ const severityOptions: { value: SeverityLevel; label: string; description: strin
   { value: "Žemas", label: "Žemas", description: "Mažas poveikis", color: "border-green-500 bg-green-50 dark:bg-green-900/20" },
 ];
 
-interface SystemButtonProps {
-  system: typeof affectedSystemOptions[0];
-  isSelected: boolean;
-  onChange: (id: string) => void;
-}
 
-const SystemButton = memo(function SystemButton({ system, isSelected, onChange }: SystemButtonProps) {
-  const handleClick = useCallback(() => {
-    onChange(system.id);
-  }, [system.id, onChange]);
-
-  return (
-    <button
-      type="button"
-      onClick={handleClick}
-      className={cn(
-        "flex items-center gap-2 p-2.5 rounded-lg border cursor-pointer transition-all",
-        isSelected
-          ? "border-primary bg-primary/5"
-          : "border-border hover:bg-muted/50"
-      )}
-      data-testid={`system-${system.id}`}
-    >
-      <Checkbox
-        checked={isSelected}
-        className="pointer-events-none"
-      />
-      <system.icon className="h-4 w-4 text-muted-foreground" />
-      <span className="text-sm">{system.label}</span>
-    </button>
-  );
-});
 
 export function IncidentForm() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const { currentUserId } = useRole();
+  const [selectedSystems, setSelectedSystems] = useState<string[]>([]);
 
   const form = useForm<CreateIncidentForm>({
     resolver: zodResolver(createIncidentFormSchema),
@@ -103,6 +73,7 @@ export function IncidentForm() {
     mutationFn: async (data: CreateIncidentForm) => {
       const response = await apiRequest("POST", "/api/incidents", {
         ...data,
+        affectedSystems: selectedSystems,
         reportedBy: currentUserId,
       });
       return response.json();
@@ -125,17 +96,16 @@ export function IncidentForm() {
     },
   });
 
-  const handleSystemToggle = useCallback((fieldValue: string[], onChange: (value: string[]) => void, id: string) => {
-    const current = fieldValue || [];
-    onChange(
-      current.includes(id)
-        ? current.filter((i: string) => i !== id)
-        : [...current, id]
-    );
-  }, []);
-
   const onSubmit = (data: CreateIncidentForm) => {
     createMutation.mutate(data);
+  };
+
+  const toggleSystem = (systemId: string) => {
+    setSelectedSystems((prev) =>
+      prev.includes(systemId)
+        ? prev.filter((id) => id !== systemId)
+        : [...prev, systemId]
+    );
   };
 
   return (
@@ -288,26 +258,32 @@ export function IncidentForm() {
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="affectedSystems"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Paveiktos sistemos (neprivaloma)</FormLabel>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {affectedSystemOptions.map((system) => (
-                      <SystemButton
-                        key={system.id}
-                        system={system}
-                        isSelected={(field.value || []).includes(system.id)}
-                        onChange={(id) => handleSystemToggle(field.value || [], field.onChange, id)}
-                      />
-                    ))}
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="space-y-3">
+              <Label>Paveiktos sistemos (neprivaloma)</Label>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {affectedSystemOptions.map((system) => (
+                  <button
+                    key={system.id}
+                    type="button"
+                    onClick={() => toggleSystem(system.id)}
+                    className={cn(
+                      "flex items-center gap-2 p-2.5 rounded-lg border cursor-pointer transition-all",
+                      selectedSystems.includes(system.id)
+                        ? "border-primary bg-primary/5"
+                        : "border-border hover:bg-muted/50"
+                    )}
+                    data-testid={`system-${system.id}`}
+                  >
+                    <Checkbox
+                      checked={selectedSystems.includes(system.id)}
+                      className="pointer-events-none"
+                    />
+                    <system.icon className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm">{system.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
 
             <div className="flex gap-3 pt-4">
               <Button
