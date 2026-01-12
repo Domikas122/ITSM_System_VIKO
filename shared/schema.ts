@@ -23,6 +23,7 @@ export const users = sqliteTable("users", {
   id: text("id", { length: 36 }).primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
+  email: text("email"),
   role: text("role").$type<UserRole>().notNull().default("Darbuotojas"),
   displayName: text("display_name").notNull(),
 });

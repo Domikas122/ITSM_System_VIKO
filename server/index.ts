@@ -3,6 +3,7 @@ import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
 import { setupAuth, registerAuthRoutes } from "./auth";
+import { initializeEmailService } from "./email";
 
 const app = express();
 const httpServer = createServer(app);
@@ -25,6 +26,9 @@ app.use(
 );
 
 app.use(express.urlencoded({ extended: false }));
+
+// Setup email service
+initializeEmailService();
 
 // Setup authentication
 setupAuth(app);

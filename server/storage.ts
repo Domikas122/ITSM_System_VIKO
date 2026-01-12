@@ -31,6 +31,7 @@ export interface IStorage {
   // Vartotojai (grąžina išvalytą vartotoją be slaptažodžio)
   getUser(id: string): Promise<SafeUser | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>; // Tik vidiniam naudojimui
+  getUsersByRole(role: string): Promise<SafeUser[]>;
   createUser(user: InsertUser): Promise<SafeUser>;
   getAllUsers(): Promise<SafeUser[]>;
   
@@ -216,6 +217,11 @@ export class MemStorage implements IStorage {
   async getUserByUsername(username: string): Promise<User | undefined> {
     // Grąžina visą vartotoją su slaptažodžiu autentifikavimo tikslais (tik vidiniam naudojimui)
     return db.select().from(users).where(eq(users.username, username)).get();
+  }
+
+  async getUsersByRole(role: string): Promise<SafeUser[]> {
+    const roleUsers = db.select().from(users).where(eq(users.role, role as any)).all();
+    return roleUsers.map(sanitizeUser);
   }
 
   async createUser(insertUser: InsertUser): Promise<SafeUser> {
