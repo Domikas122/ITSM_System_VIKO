@@ -24,13 +24,13 @@ export default function Incidents() {
 
   const queryString = useMemo(() => {
     const queryParams = new URLSearchParams();
-    if (filters.status?.length) queryParams.set("Statusas", filters.status.join(","));
-    if (filters.category?.length) queryParams.set("Kategorija", filters.category.join(","));
-    if (filters.severity?.length) queryParams.set("Sunkumas", filters.severity.join(","));
-    if (filters.dateFrom) queryParams.set("DataNuo", filters.dateFrom);
-    if (filters.dateTo) queryParams.set("DataIki", filters.dateTo);
-    if (filters.search) queryParams.set("Paieška", filters.search);
-    if (!isSpecialist && currentUserId) queryParams.set("Pranešėjas", currentUserId);
+    if (filters.status?.length) queryParams.set("status", filters.status.join(","));
+    if (filters.category?.length) queryParams.set("category", filters.category.join(","));
+    if (filters.severity?.length) queryParams.set("severity", filters.severity.join(","));
+    if (filters.dateFrom) queryParams.set("dateFrom", filters.dateFrom);
+    if (filters.dateTo) queryParams.set("dateTo", filters.dateTo);
+    if (filters.search) queryParams.set("search", filters.search);
+    if (!isSpecialist && currentUserId) queryParams.set("reportedBy", currentUserId);
     return queryParams.toString();
   }, [filters, isSpecialist, currentUserId]);
   const { data: incidents, isLoading, refetch } = useQuery<Incident[]>({
