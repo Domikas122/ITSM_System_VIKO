@@ -19,6 +19,7 @@ export function initializeDatabase() {
       id TEXT PRIMARY KEY,
       username TEXT NOT NULL UNIQUE,
       password TEXT NOT NULL,
+      email TEXT,
       role TEXT NOT NULL DEFAULT 'Darbuotojas',
       display_name TEXT NOT NULL
     )
