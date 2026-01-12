@@ -1,4 +1,4 @@
-import { pgTable, text, varchar, timestamp, integer } from "drizzle-orm/pg-core";
+import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -19,8 +19,8 @@ export const userRoles = ["Darbuotojas", "IT_specialistas"] as const;
 export type UserRole = typeof userRoles[number];
 
 // Users table
-export const users = pgTable("users", {
-  id: varchar("id", { length: 36 }).primaryKey(),
+export const users = sqliteTable("users", {
+  id: text("id", { length: 36 }).primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   role: text("role").$type<UserRole>().notNull().default("Darbuotojas"),
@@ -32,21 +32,21 @@ export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 
 // Incidentų lentelė
-export const incidents = pgTable("incidents", {
-  id: varchar("id", { length: 36 }).primaryKey(),
+export const incidents = sqliteTable("incidents", {
+  id: text("id", { length: 36 }).primaryKey(),
   title: text("title").notNull(),
   description: text("description").notNull(),
   category: text("category").$type<IncidentCategory>().notNull(),
   severity: text("severity").$type<SeverityLevel>().notNull(),
   status: text("status").$type<IncidentStatus>().notNull().default("Naujas"),
-  affectedSystems: text("affected_systems").array(),
-  reportedBy: varchar("reported_by", { length: 36 }).notNull(),
-  assignedTo: varchar("assigned_to", { length: 36 }),
-  aiTags: text("ai_tags").array(),
+  affectedSystems: text("affected_systems", { mode: "json" }).$type<string[] | null>(),
+  reportedBy: text("reported_by", { length: 36 }).notNull(),
+  assignedTo: text("assigned_to", { length: 36 }),
+  aiTags: text("ai_tags", { mode: "json" }).$type<string[] | null>(),
   aiAnalysis: text("ai_analysis"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-  resolvedAt: timestamp("resolved_at"),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
+  resolvedAt: integer("resolved_at", { mode: "timestamp" }),
 });
 
 export const insertIncidentSchema = createInsertSchema(incidents).omit({ 
@@ -64,15 +64,15 @@ export type InsertIncident = z.infer<typeof insertIncidentSchema>;
 export type Incident = typeof incidents.$inferSelect;
 
 // Incident history for tracking changes
-export const incidentHistory = pgTable("incident_history", {
-  id: varchar("id", { length: 36 }).primaryKey(),
-  incidentId: varchar("incident_id", { length: 36 }).notNull(),
+export const incidentHistory = sqliteTable("incident_history", {
+  id: text("id", { length: 36 }).primaryKey(),
+  incidentId: text("incident_id", { length: 36 }).notNull(),
   action: text("action").notNull(),
   previousStatus: text("previous_status").$type<IncidentStatus>(),
   newStatus: text("new_status").$type<IncidentStatus>(),
-  performedBy: varchar("performed_by", { length: 36 }).notNull(),
+  performedBy: text("performed_by", { length: 36 }).notNull(),
   notes: text("notes"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull().$defaultFn(() => new Date()),
 });
 
 export const insertIncidentHistorySchema = createInsertSchema(incidentHistory).omit({

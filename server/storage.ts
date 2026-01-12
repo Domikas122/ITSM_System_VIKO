@@ -14,8 +14,13 @@ import {
   incidentStatuses,
   severityLevels,
   incidentCategories,
+  users,
+  incidents,
+  incidentHistory as incidentHistoryTable,
 } from "@shared/schema";
 import { randomUUID } from "crypto";
+import { db, initializeDatabase } from "./db";
+import { eq, and, gte, lte, like, or, desc, ne } from "drizzle-orm";
 
 function sanitizeUser(user: User): SafeUser {
   const { password, ...safeUser } = user;
@@ -44,47 +49,56 @@ export interface IStorage {
 }
 
 export class MemStorage implements IStorage {
-  private users: Map<string, User>;
-  private incidents: Map<string, Incident>;
-  private incidentHistory: Map<string, IncidentHistory>;
-
   constructor() {
-    this.users = new Map();
-    this.incidents = new Map();
-    this.incidentHistory = new Map();
+    console.log("🔧 Initializing MemStorage...");
+    initializeDatabase();
     this.initializeDefaultData();
   }
 
   private initializeDefaultData() {
+    console.log("🔄 Checking for existing data...");
+
+    // Check if users already exist
+    const existingUsers = db.select().from(users).all();
+    console.log(`📊 Found ${existingUsers.length} existing users`);
+    
+    if (existingUsers.length > 0) {
+      console.log("✅ Database already has data, skipping initialization");
+      return;
+    }
+
+    console.log("📦 Initializing demo data...");
+
     // TIK KŪRIMAS: Demo naudotojai, skirti vaidmenų pagrįsto funkcionalumo testavimui
     // Gamybos procese vartotojai būtų kuriamai per tinkamą autentifikavimo procesą.
-    const specialistUser: User = {
-      id: "specialist-1",
-      username: "dom.kop",
-      password: "mkl23MKL",
-      role: "IT_specialistas",
-      displayName: "Dominykas Kopijevas",
-    };
-    
-    const employeeUser: User = {
-      id: "employee-1",
-      username: "ona.mika",
-      password: "abc123ABC",
-      role: "Darbuotojas",
-      displayName: "Ona Mikalauskaitė",
-    };
+    const demoUsers: User[] = [
+      {
+        id: "specialist-1",
+        username: "dom.kop",
+        password: "mkl23MKL",
+        role: "IT_specialistas",
+        displayName: "Dominykas Kopijevas",
+      },
+      {
+        id: "employee-1",
+        username: "ona.mika",
+        password: "abc123ABC",
+        role: "Darbuotojas",
+        displayName: "Ona Mikalauskaitė",
+      },
+      {
+        id: "employee-2",
+        username: "alb.miz",
+        password: "jkl456JKL",
+        role: "Darbuotojas",
+        displayName: "Albas Mizgaitis",
+      },
+    ];
 
-    const employeeUser2: User = {
-      id: "employee-2",
-      username: "alb.miz",
-      password: "jkl456JKL",
-      role: "Darbuotojas",
-      displayName: "Albas Mizgaitis",
-    };
-
-    this.users.set(specialistUser.id, specialistUser);
-    this.users.set(employeeUser.id, employeeUser);
-    this.users.set(employeeUser2.id, employeeUser2);
+    // Insert demo users
+    for (const user of demoUsers) {
+      db.insert(users).values(user).run();
+    }
 
     // Sukurti pavyzdinius incidentus demonstravimui
     const sampleIncidents = [
@@ -165,7 +179,7 @@ export class MemStorage implements IStorage {
           : null,
       };
       
-      this.incidents.set(id, incident);
+      db.insert(incidents).values(incident).run();
       
       // Pridėti kūrimo istoriją
       const historyId = randomUUID();
@@ -179,21 +193,21 @@ export class MemStorage implements IStorage {
         notes: null,
         createdAt,
       };
-      this.incidentHistory.set(historyId, history);
+      db.insert(incidentHistoryTable).values(history).run();
     }
+
+    console.log("✅ Demo data initialized");
   }
 
   // Vartotojo metodai
   async getUser(id: string): Promise<SafeUser | undefined> {
-    const user = this.users.get(id);
+    const user = db.select().from(users).where(eq(users.id, id)).get();
     return user ? sanitizeUser(user) : undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
     // Grąžina visą vartotoją su slaptažodžiu autentifikavimo tikslais (tik vidiniam naudojimui)
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    return db.select().from(users).where(eq(users.username, username)).get();
   }
 
   async createUser(insertUser: InsertUser): Promise<SafeUser> {
@@ -205,17 +219,17 @@ export class MemStorage implements IStorage {
         ? insertUser.role
         : "Darbuotojas" // default or handle error as needed
     };
-    this.users.set(id, user);
+    db.insert(users).values(user).run();
     return sanitizeUser(user);
   }
 
   // Incidentų metodai
   async getIncident(id: string): Promise<Incident | undefined> {
-    return this.incidents.get(id);
+    return db.select().from(incidents).where(eq(incidents.id, id)).get();
   }
 
   async getIncidentWithDetails(id: string): Promise<IncidentWithDetails | undefined> {
-    const incident = this.incidents.get(id);
+    const incident = await this.getIncident(id);
     if (!incident) return undefined;
 
     const reporter = await this.getUser(incident.reportedBy);
@@ -233,41 +247,44 @@ export class MemStorage implements IStorage {
   }
 
   async getAllIncidents(filters?: IncidentFilters): Promise<Incident[]> {
-    let incidents = Array.from(this.incidents.values());
+    let query = db.select().from(incidents);
+    const conditions = [];
 
     if (filters) {
       if (filters.status?.length) {
-        incidents = incidents.filter((i) => filters.status!.includes(i.status));
+        conditions.push(or(...filters.status.map(s => eq(incidents.status, s))));
       }
       if (filters.category?.length) {
-        incidents = incidents.filter((i) => filters.category!.includes(i.category));
+        conditions.push(or(...filters.category.map(c => eq(incidents.category, c))));
       }
       if (filters.severity?.length) {
-        incidents = incidents.filter((i) => filters.severity!.includes(i.severity));
+        conditions.push(or(...filters.severity.map(s => eq(incidents.severity, s))));
       }
       if (filters.dateFrom) {
         const fromDate = new Date(filters.dateFrom);
-        incidents = incidents.filter((i) => new Date(i.createdAt) >= fromDate);
+        conditions.push(gte(incidents.createdAt, fromDate));
       }
       if (filters.dateTo) {
         const toDate = new Date(filters.dateTo);
         toDate.setHours(23, 59, 59, 999);
-        incidents = incidents.filter((i) => new Date(i.createdAt) <= toDate);
+        conditions.push(lte(incidents.createdAt, toDate));
       }
       if (filters.search) {
-        const searchLower = filters.search.toLowerCase();
-        incidents = incidents.filter(
-          (i) =>
-            i.title.toLowerCase().includes(searchLower) ||
-            i.description.toLowerCase().includes(searchLower)
+        const searchPattern = `%${filters.search}%`;
+        conditions.push(
+          or(
+            like(incidents.title, searchPattern),
+            like(incidents.description, searchPattern)
+          )
         );
       }
     }
 
-    // Rūšiuoti pagal sukūrimo datą mažėjančia tvarka
-    return incidents.sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
+    let result = conditions.length > 0 
+      ? query.where(and(...conditions)).orderBy(desc(incidents.createdAt)).all()
+      : query.orderBy(desc(incidents.createdAt)).all();
+
+    return result;
   }
 
   async createIncident(insertIncident: InsertIncident): Promise<Incident> {
@@ -281,7 +298,7 @@ export class MemStorage implements IStorage {
       category: insertIncident.category as "IT" | "Kibernetinis",
       severity: insertIncident.severity as "Kritinis" | "Aukštas" | "Vidutinis" | "Žemas",
       status: "Naujas",
-      affectedSystems: insertIncident.affectedSystems || null,
+      affectedSystems: (insertIncident.affectedSystems as string[]) || null,
       reportedBy: insertIncident.reportedBy,
       assignedTo: null,
       aiTags: null,
@@ -291,7 +308,7 @@ export class MemStorage implements IStorage {
       resolvedAt: null,
     };
     
-    this.incidents.set(id, incident);
+    db.insert(incidents).values(incident).run();
 
     // Sukurti istorijos įrašą
     await this.createIncidentHistory({
@@ -307,7 +324,7 @@ export class MemStorage implements IStorage {
   }
 
   async updateIncident(id: string, updates: Partial<Incident>): Promise<Incident | undefined> {
-    const incident = this.incidents.get(id);
+    const incident = await this.getIncident(id);
     if (!incident) return undefined;
 
     const updatedIncident: Incident = {
@@ -316,16 +333,21 @@ export class MemStorage implements IStorage {
       updatedAt: new Date(),
     };
 
-    this.incidents.set(id, updatedIncident);
+    db.update(incidents)
+      .set(updatedIncident)
+      .where(eq(incidents.id, id))
+      .run();
+    
     return updatedIncident;
   }
 
   async deleteIncident(id: string): Promise<boolean> {
-    return this.incidents.delete(id);
+    const result = db.delete(incidents).where(eq(incidents.id, id)).run();
+    return result.changes > 0;
   }
 
   async getIncidentStats(): Promise<DashboardStats> {
-    const incidents = Array.from(this.incidents.values());
+    const allIncidents = db.select().from(incidents).all();
     
     const byStatus: Record<IncidentStatus, number> = {
       Naujas: 0,
@@ -336,25 +358,25 @@ export class MemStorage implements IStorage {
     };
 
     const bySeverity: Record<string, number> = {
-      critical: 0,
-      high: 0,
-      medium: 0,
-      low: 0,
+      Kritinis: 0,
+      Aukštas: 0,
+      Vidutinis: 0,
+      Žemas: 0,
     };
 
     const byCategory: Record<string, number> = {
-      it: 0,
-      cyber: 0,
+      IT: 0,
+      Kibernetinis: 0,
     };
 
-    for (const incident of incidents) {
+    for (const incident of allIncidents) {
       byStatus[incident.status]++;
       bySeverity[incident.severity]++;
       byCategory[incident.category]++;
     }
 
     return {
-      total: incidents.length,
+      total: allIncidents.length,
       byStatus,
       bySeverity,
       byCategory,
@@ -362,15 +384,14 @@ export class MemStorage implements IStorage {
   }
 
   async findSimilarIncidents(incidentId: string, description: string): Promise<SimilarIncident[]> {
-    const incidents = Array.from(this.incidents.values())
-      .filter((i) => i.id !== incidentId);
+    const allIncidents = db.select().from(incidents).where(ne(incidents.id, incidentId)).all();
 
     // Paprastas panašumas pagal raktažodžius (gamybos procese naudokite įterpimus)
     const keywords = description.toLowerCase().split(/\s+/).filter(w => w.length > 3);
     
     const similar: SimilarIncident[] = [];
     
-    for (const incident of incidents) {
+    for (const incident of allIncidents) {
       const incidentWords = (incident.title + " " + incident.description).toLowerCase().split(/\s+/);
       const matchCount = keywords.filter((k) => incidentWords.some((w) => w.includes(k))).length;
       const similarity = matchCount / Math.max(keywords.length, 1);
@@ -394,9 +415,11 @@ export class MemStorage implements IStorage {
 
   // Incidentų istorijos metodai
   async getIncidentHistory(incidentId: string): Promise<IncidentHistory[]> {
-    return Array.from(this.incidentHistory.values())
-      .filter((h) => h.incidentId === incidentId)
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return db.select()
+      .from(incidentHistoryTable)
+      .where(eq(incidentHistoryTable.incidentId, incidentId))
+      .orderBy(desc(incidentHistoryTable.createdAt))
+      .all();
   }
 
   async createIncidentHistory(insertHistory: InsertIncidentHistory): Promise<IncidentHistory> {
@@ -415,7 +438,7 @@ export class MemStorage implements IStorage {
       notes: insertHistory.notes ?? null,
       createdAt: new Date(),
     };
-    this.incidentHistory.set(id, history);
+    db.insert(incidentHistoryTable).values(history).run();
     return history;
   }
 }
