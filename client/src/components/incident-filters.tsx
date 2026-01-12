@@ -33,23 +33,23 @@ interface IncidentFiltersProps {
 }
 
 const statusLabels: Record<IncidentStatus, string> = {
-  Naujas: "New",
-  Paskirtas: "Assigned",
-  Vykdomas: "In Progress",
-  Išspręstas: "Resolved",
-  Uždarytas: "Closed",
+  Naujas: "Naujas",
+  Paskirtas: "Paskirtas",
+  Vykdomas: "Vykdomas",
+  Išspręstas: "Išspręstas",
+  Uždarytas: "Uždarytas",
 };
 
 const categoryLabels: Record<IncidentCategory, string> = {
   IT: "IT",
-  Kibernetinis: "Cyber",
+  Kibernetinis: "Kibernetinis",
 };
 
 const severityLabels: Record<SeverityLevel, string> = {
-  Kritinis: "Critical",
-  Aukštas: "High",
-  Vidutinis: "Medium",
-  Žemas: "Low",
+  Kritinis: "Kritinis",
+  Aukštas: "Aukštas",
+  Vidutinis: "Vidutinis",
+  Žemas: "Žemas",
 };
 
 export function IncidentFilters({ filters, onFiltersChange }: IncidentFiltersProps) {
@@ -135,7 +135,7 @@ export function IncidentFilters({ filters, onFiltersChange }: IncidentFiltersPro
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search incidents..."
+              placeholder="Ieškoti incidentų..."
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearchSubmit()}
@@ -150,10 +150,10 @@ export function IncidentFilters({ filters, onFiltersChange }: IncidentFiltersPro
           onValueChange={handleStatusChange}
         >
           <SelectTrigger className="w-[140px]" data-testid="select-status">
-            <SelectValue placeholder="Status" />
+            <SelectValue placeholder="Statusas" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
+            <SelectItem value="all">Visi statusai</SelectItem>
             {incidentStatuses.map((status) => (
               <SelectItem key={status} value={status}>
                 {statusLabels[status]}
@@ -167,10 +167,10 @@ export function IncidentFilters({ filters, onFiltersChange }: IncidentFiltersPro
           onValueChange={handleCategoryChange}
         >
           <SelectTrigger className="w-[130px]" data-testid="select-category">
-            <SelectValue placeholder="Category" />
+            <SelectValue placeholder="Kategorija" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Categories</SelectItem>
+            <SelectItem value="all">Visos kategorijos</SelectItem>
             {incidentCategories.map((cat) => (
               <SelectItem key={cat} value={cat}>
                 {categoryLabels[cat]}
@@ -184,10 +184,10 @@ export function IncidentFilters({ filters, onFiltersChange }: IncidentFiltersPro
           onValueChange={handleSeverityChange}
         >
           <SelectTrigger className="w-[130px]" data-testid="select-severity">
-            <SelectValue placeholder="Severity" />
+            <SelectValue placeholder="Lygis" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Severity</SelectItem>
+            <SelectItem value="all">Visi lygiai</SelectItem>
             {severityLevels.map((sev) => (
               <SelectItem key={sev} value={sev}>
                 {severityLabels[sev]}
