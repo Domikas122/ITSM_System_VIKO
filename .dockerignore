@@ -1,0 +1,18 @@
+# flyctl launch added from .gitignore
+**/node_modules
+**/dist
+**/.DS_Store
+**/server/public
+**/vite.config.ts.*
+**/*.tar.gz
+.vscode/edge-profile
+
+# SQLite database
+**/*.db
+**/*.db-journal
+**/*.db-wal
+**/*.db-shm
+
+# flyctl launch added from .venv/.gitignore
+.venv/**/*
+fly.toml
