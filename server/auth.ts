@@ -69,6 +69,7 @@ export function registerAuthRoutes(app: Express) {
         username: user.username,
         role: user.role,
         displayName: user.displayName,
+        email: user.email,
       };
 
       res.json({
