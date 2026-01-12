@@ -259,8 +259,9 @@ export function IncidentForm() {
               <Label>Paveiktos sistemos (neprivaloma)</Label>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {affectedSystemOptions.map((system) => (
-                  <div
+                  <button
                     key={system.id}
+                    type="button"
                     onClick={() => toggleSystem(system.id)}
                     className={cn(
                       "flex items-center gap-2 p-2.5 rounded-lg border cursor-pointer transition-all",
@@ -272,11 +273,12 @@ export function IncidentForm() {
                   >
                     <Checkbox
                       checked={selectedSystems.includes(system.id)}
-                      className="pointer-events-none"
+                      onCheckedChange={() => toggleSystem(system.id)}
+                      className="pointer-events-auto"
                     />
                     <system.icon className="h-4 w-4 text-muted-foreground" />
                     <span className="text-sm">{system.label}</span>
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>
