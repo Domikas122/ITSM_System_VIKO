@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
-import { useCallback } from "react";
+import { useCallback, memo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -56,12 +56,15 @@ interface SystemButtonProps {
   onChange: (id: string) => void;
 }
 
-function SystemButton({ system, isSelected, onChange }: SystemButtonProps) {
+const SystemButton = memo(function SystemButton({ system, isSelected, onChange }: SystemButtonProps) {
+  const handleClick = useCallback(() => {
+    onChange(system.id);
+  }, [system.id, onChange]);
+
   return (
     <button
-      key={system.id}
       type="button"
-      onClick={() => onChange(system.id)}
+      onClick={handleClick}
       className={cn(
         "flex items-center gap-2 p-2.5 rounded-lg border cursor-pointer transition-all",
         isSelected
@@ -78,7 +81,7 @@ function SystemButton({ system, isSelected, onChange }: SystemButtonProps) {
       <span className="text-sm">{system.label}</span>
     </button>
   );
-}
+});
 
 export function IncidentForm() {
   const [, setLocation] = useLocation();
@@ -121,6 +124,15 @@ export function IncidentForm() {
       });
     },
   });
+
+  const handleSystemToggle = useCallback((fieldValue: string[], onChange: (value: string[]) => void, id: string) => {
+    const current = fieldValue || [];
+    onChange(
+      current.includes(id)
+        ? current.filter((i: string) => i !== id)
+        : [...current, id]
+    );
+  }, []);
 
   const onSubmit = (data: CreateIncidentForm) => {
     createMutation.mutate(data);
@@ -288,14 +300,7 @@ export function IncidentForm() {
                         key={system.id}
                         system={system}
                         isSelected={(field.value || []).includes(system.id)}
-                        onChange={(id) => {
-                          const current = field.value || [];
-                          field.onChange(
-                            current.includes(id)
-                              ? current.filter((i: string) => i !== id)
-                              : [...current, id]
-                          );
-                        }}
+                        onChange={(id) => handleSystemToggle(field.value || [], field.onChange, id)}
                       />
                     ))}
                   </div>
