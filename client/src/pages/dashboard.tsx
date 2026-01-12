@@ -23,13 +23,13 @@ export default function Dashboard() {
 
   const queryString = useMemo(() => {
     const params = new URLSearchParams();
-    if (filters.status?.length) params.set("Būklė", filters.status.join(","));
-    if (filters.category?.length) params.set("Kategorija", filters.category.join(","));
-    if (filters.severity?.length) params.set("Sunkumas", filters.severity.join(","));
-    if (filters.dateFrom) params.set("dataNuo", filters.dateFrom);
-    if (filters.dateTo) params.set("dataIki", filters.dateTo);
-    if (filters.search) params.set("paieška", filters.search);
-    if (!isSpecialist && currentUserId) params.set("pranešė", currentUserId);
+    if (filters.status?.length) params.set("status", filters.status.join(","));
+    if (filters.category?.length) params.set("category", filters.category.join(","));
+    if (filters.severity?.length) params.set("severity", filters.severity.join(","));
+    if (filters.dateFrom) params.set("dateFrom", filters.dateFrom);
+    if (filters.dateTo) params.set("dateTo", filters.dateTo);
+    if (filters.search) params.set("search", filters.search);
+    if (!isSpecialist && currentUserId) params.set("reportedBy", currentUserId);
     return params.toString();
   }, [filters, isSpecialist, currentUserId]);
   const { data: incidents, isLoading: incidentsLoading, refetch } = useQuery<Incident[]>({
