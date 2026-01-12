@@ -96,10 +96,25 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        blob: {
+          "0%, 100%": {
+            transform: "translate(0, 0) scale(1)",
+          },
+          "33%": {
+            transform: "translate(30px, -50px) scale(1.1)",
+          },
+          "66%": {
+            transform: "translate(-20px, 20px) scale(0.9)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        blob: "blob 7s infinite",
+      },
+      backgroundImage: {
+        "grid-white": "url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3e%3cpath d='M0 .5H31.5V32' fill='none' stroke='white' stroke-width='1'/%3e%3c/svg%3e\")",
       },
     },
   },

@@ -75,8 +75,8 @@ export class MemStorage implements IStorage {
     const demoUsers: User[] = [
       {
         id: "specialist-1",
-        username: "Domikas122",
-        password: "mkl23MKL",
+        username: "domikas122",
+        password: "mkl123MKL",
         role: "IT_specialistas",
         displayName: "Dominykas Kopijevas",
       },
@@ -93,6 +93,13 @@ export class MemStorage implements IStorage {
         password: "jkl456JKL",
         role: "Darbuotojas",
         displayName: "Albas Mizgaitis",
+      },
+      {
+        id: "employee-3",
+        username: "var.pav",
+        password: "abc123ABC",
+        role: "Darbuotojas",
+        displayName: "Varėnė Pavilionienė",
       },
     ];
 

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import type { SafeUser } from "@shared/schema";
 export default function Login() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -32,11 +33,16 @@ export default function Login() {
       return response.json() as Promise<SafeUser>;
     },
     onSuccess: () => {
+      // Invalidate current user query to refresh auth state
+      queryClient.invalidateQueries({ queryKey: ["currentUser"] });
       toast({
         title: "Sėkmingai prisijungta",
         description: "Peradresuojama į pagrindinį puslapį...",
       });
-      setLocation("/");
+      // Redirect to dashboard after a brief delay
+      setTimeout(() => {
+        setLocation("/");
+      }, 500);
     },
     onError: (error: Error) => {
       toast({
@@ -61,9 +67,21 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-4">
-      <Card className="w-full max-w-md shadow-xl">
-        <CardHeader className="space-y-1 text-center">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 dark:from-slate-950 dark:via-blue-950 dark:to-slate-950 p-4 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+        <div className="absolute top-40 right-10 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+      </div>
+
+      {/* Decorative grid pattern */}
+      <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:50px_50px] pointer-events-none"></div>
+
+      {/* Content */}
+      <div className="relative z-10">
+        <Card className="w-full max-w-md shadow-xl border-blue-400/20 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm">
+          <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-4">
             <div className="p-3 bg-primary/10 rounded-full">
               <Shield className="h-12 w-12 text-primary" />
@@ -116,18 +134,19 @@ export default function Login() {
               <p className="font-semibold text-center mb-3">Demo prisijungimo duomenys:</p>
               <div className="space-y-1 text-xs">
                 <p><strong>IT Specialistas:</strong></p>
-                <p>• Naudotojas: <code className="bg-muted px-1 py-0.5 rounded">dom.kop</code></p>
-                <p>• Slaptažodis: <code className="bg-muted px-1 py-0.5 rounded">mkl23MKL</code></p>
+                <p>• Naudotojas: <code className="bg-muted px-1 py-0.5 rounded">domikas122</code></p>
+                <p>• Slaptažodis: <code className="bg-muted px-1 py-0.5 rounded">mkl123MKL</code></p>
               </div>
               <div className="space-y-1 text-xs mt-3">
                 <p><strong>Darbuotojas:</strong></p>
-                <p>• Naudotojas: <code className="bg-muted px-1 py-0.5 rounded">ona.mika</code></p>
+                <p>• Naudotojas: <code className="bg-muted px-1 py-0.5 rounded">var.pav</code></p>
                 <p>• Slaptažodis: <code className="bg-muted px-1 py-0.5 rounded">abc123ABC</code></p>
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }
