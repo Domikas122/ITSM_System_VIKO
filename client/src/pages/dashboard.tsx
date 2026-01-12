@@ -29,7 +29,7 @@ export default function Dashboard() {
     if (filters.dateFrom) params.set("dataNuo", filters.dateFrom);
     if (filters.dateTo) params.set("dataIki", filters.dateTo);
     if (filters.search) params.set("paieška", filters.search);
-    if (!isSpecialist) params.set("pranešė", currentUserId);
+    if (!isSpecialist && currentUserId) params.set("pranešė", currentUserId);
     return params.toString();
   }, [filters, isSpecialist, currentUserId]);
   const { data: incidents, isLoading: incidentsLoading, refetch } = useQuery<Incident[]>({

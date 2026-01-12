@@ -32,6 +32,7 @@ export interface IStorage {
   getUser(id: string): Promise<SafeUser | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>; // Tik vidiniam naudojimui
   createUser(user: InsertUser): Promise<SafeUser>;
+  getAllUsers(): Promise<SafeUser[]>;
   
   // Incidentai
   getIncident(id: string): Promise<Incident | undefined>;
@@ -74,7 +75,7 @@ export class MemStorage implements IStorage {
     const demoUsers: User[] = [
       {
         id: "specialist-1",
-        username: "dom.kop",
+        username: "Domikas122",
         password: "mkl23MKL",
         role: "IT_specialistas",
         displayName: "Dominykas Kopijevas",
@@ -221,6 +222,11 @@ export class MemStorage implements IStorage {
     };
     db.insert(users).values(user).run();
     return sanitizeUser(user);
+  }
+
+  async getAllUsers(): Promise<SafeUser[]> {
+    const allUsers = db.select().from(users).all();
+    return allUsers.map(sanitizeUser);
   }
 
   // Incidentų metodai

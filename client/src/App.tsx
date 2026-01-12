@@ -12,16 +12,40 @@ import Dashboard from "@/pages/dashboard";
 import Incidents from "@/pages/incidents";
 import NewIncident from "@/pages/new-incident";
 import IncidentDetailPage from "@/pages/incident-detail";
+import Login from "@/pages/login";
+import UserManagement from "@/pages/user-management";
 import NotFound from "@/pages/not-found";
 import { useMemo } from "react";
+import { useAuth } from "@/lib/use-auth";
+
+function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg">Kraunama...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    window.location.href = "/login";
+    return null;
+  }
+
+  return <Component />;
+}
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Dashboard} />
-      <Route path="/incidents" component={Incidents} />
-      <Route path="/incidents/new" component={NewIncident} />
-      <Route path="/incidents/:id" component={IncidentDetailPage} />
+      <Route path="/login" component={Login} />
+      <Route path="/" component={() => <ProtectedRoute component={Dashboard} />} />
+      <Route path="/incidents" component={() => <ProtectedRoute component={Incidents} />} />
+      <Route path="/incidents/new" component={() => <ProtectedRoute component={NewIncident} />} />
+      <Route path="/incidents/:id" component={() => <ProtectedRoute component={IncidentDetailPage} />} />
+      <Route path="/users" component={() => <ProtectedRoute component={UserManagement} />} />
       <Route component={NotFound} />
     </Switch>
   );

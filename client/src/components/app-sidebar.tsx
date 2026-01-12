@@ -5,7 +5,9 @@ import {
   Shield, 
   Monitor,
   User,
-  UserCog
+  UserCog,
+  Users,
+  LogOut
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import {
@@ -22,13 +24,17 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { useRole } from "@/lib/role-context";
+import { useAuth } from "@/lib/use-auth";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
 
 const specialistMenuItems = [
   { title: "Informacinis skydelis", url: "/", icon: LayoutDashboard },
   { title: "Visi incidentai", url: "/incidents", icon: List },
   { title: "Nauji incidentai", url: "/incidents/new", icon: Plus },
+  { title: "Vartotojų valdymas", url: "/users", icon: Users },
 ];
 
 const employeeMenuItems = [
@@ -38,7 +44,10 @@ const employeeMenuItems = [
 
 export function AppSidebar() {
   const [location] = useLocation();
-  const { role, setRole, currentUserName } = useRole();
+  const { role, currentUserName } = useRole();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
   
   const menuItems = role === "IT_specialistas" ? specialistMenuItems : employeeMenuItems;
 
@@ -122,32 +131,36 @@ export function AppSidebar() {
               )}
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-medium">{currentUserName}</span>
-              <Badge variant="secondary" className="w-fit text-xs capitalize">
-                {role}
+              <span className="text-sm font-medium">{currentUserName || "Vartotojas"}</span>
+              <Badge variant="secondary" className="w-fit text-xs">
+                {role === "IT_specialistas" ? "IT Specialistas" : "Darbuotojas"}
               </Badge>
             </div>
           </div>
-          <div className="flex gap-2">
-            <Button
-              variant={role === "Darbuotojas" ? "default" : "outline"}
-              size="sm"
-              className="flex-1 text-xs"
-              onClick={() => setRole("Darbuotojas")}
-              data-testid="button-role-employee"
-            >
-              Darbuotojas
-            </Button>
-            <Button
-              variant={role === "IT_specialistas" ? "default" : "outline"}
-              size="sm"
-              className="flex-1 text-xs"
-              onClick={() => setRole("IT_specialistas")}
-              data-testid="button-role-specialist"
-            >
-              IT_specialistas
-            </Button>
-          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full"
+            onClick={async () => {
+              try {
+                await fetch("/api/auth/logout", {
+                  method: "POST",
+                  credentials: "include",
+                });
+                queryClient.clear();
+                window.location.href = "/login";
+              } catch (error) {
+                toast({
+                  title: "Klaida",
+                  description: "Nepavyko atsijungti",
+                  variant: "destructive",
+                });
+              }
+            }}
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Atsijungti
+          </Button>
         </div>
       </SidebarFooter>
     </Sidebar>

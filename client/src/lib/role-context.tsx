@@ -1,34 +1,23 @@
-import { createContext, useContext, useState, useMemo } from "react";
+import { createContext, useContext, useMemo } from "react";
 import type { UserRole } from "@shared/schema";
+import { useAuth } from "./use-auth";
 
 interface RoleContextType {
   role: UserRole;
-  setRole: (role: UserRole) => void;
-  currentUserId: string;
-  currentUserName: string;
+  currentUserId: string | null;
+  currentUserName: string | null;
 }
 
 const RoleContext = createContext<RoleContextType | undefined>(undefined);
 
 export function RoleProvider({ children }: { children: React.ReactNode }) {
-  const [role, setRole] = useState<UserRole>("IT_specialistas");
-  
-  // Mock current user - in a real app this would come from auth
-  const currentUserId = useMemo(() => 
-    role === "IT_specialistas" ? "specialist-1" : "employee-1",
-    [role]
-  );
-  const currentUserName = useMemo(() => 
-    role === "IT_specialistas" ? "Dominykas Kopijevas" : "Ona Kepenienė",
-    [role]
-  );
+  const { user } = useAuth();
   
   const value = useMemo(() => ({
-    role,
-    setRole,
-    currentUserId,
-    currentUserName
-  }), [role, currentUserId, currentUserName]);
+    role: user?.role || "Darbuotojas",
+    currentUserId: user?.id || null,
+    currentUserName: user?.displayName || null,
+  }), [user]);
   
   return (
     <RoleContext.Provider value={value}>

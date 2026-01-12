@@ -30,7 +30,7 @@ export default function Incidents() {
     if (filters.dateFrom) queryParams.set("DataNuo", filters.dateFrom);
     if (filters.dateTo) queryParams.set("DataIki", filters.dateTo);
     if (filters.search) queryParams.set("Paieška", filters.search);
-    if (!isSpecialist) queryParams.set("Pranešėjas", currentUserId);
+    if (!isSpecialist && currentUserId) queryParams.set("Pranešėjas", currentUserId);
     return queryParams.toString();
   }, [filters, isSpecialist, currentUserId]);
   const { data: incidents, isLoading, refetch } = useQuery<Incident[]>({
