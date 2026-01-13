@@ -158,4 +158,63 @@ export function registerAuthRoutes(app: Express) {
       res.status(500).json({ message: "Nepavyko gauti vartotojų" });
     }
   });
+
+  // Delete user (requires IT specialist)
+  app.delete("/api/users/:id", requireAuth, requireSpecialist, async (req: Request, res: Response) => {
+    try {
+      const userId = req.params.id;
+      
+      // Prevent deleting the current user
+      if (userId === req.session.userId) {
+        return res.status(400).json({ message: "Negalite ištrinti savo paskyros" });
+      }
+
+      const deleted = await storage.deleteUser(userId);
+      if (!deleted) {
+        return res.status(404).json({ message: "Vartotojas nerastas" });
+      }
+
+      res.json({ message: "Vartotojas sėkmingai ištrinta" });
+    } catch (error) {
+      console.error("Klaida ištrinti vartotoją:", error);
+      res.status(500).json({ message: "Nepavyko ištrinti vartotojo" });
+    }
+  });
+
+  // Update user (requires IT specialist)
+  app.put("/api/users/:id", requireAuth, requireSpecialist, async (req: Request, res: Response) => {
+    try {
+      const userId = req.params.id;
+      const { username, password, displayName, role } = req.body;
+
+      // Validate role if provided
+      if (role && role !== "Darbuotojas" && role !== "IT_specialistas") {
+        return res.status(400).json({ message: "Neteisingas vaidmuo" });
+      }
+
+      // Check if new username is already taken by another user
+      if (username) {
+        const existing = await storage.getUserByUsername(username);
+        if (existing && existing.id !== userId) {
+          return res.status(400).json({ message: "Naudotojo vardas jau užimtas" });
+        }
+      }
+
+      const updated = await storage.updateUser(userId, {
+        username,
+        password,
+        displayName,
+        role,
+      });
+
+      if (!updated) {
+        return res.status(404).json({ message: "Vartotojas nerastas" });
+      }
+
+      res.json(updated);
+    } catch (error) {
+      console.error("Klaida atnaujinant vartotoją:", error);
+      res.status(500).json({ message: "Nepavyko atnaujinti vartotojo" });
+    }
+  });
 }

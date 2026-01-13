@@ -34,6 +34,8 @@ export interface IStorage {
   getUsersByRole(role: string): Promise<SafeUser[]>;
   createUser(user: InsertUser): Promise<SafeUser>;
   getAllUsers(): Promise<SafeUser[]>;
+  deleteUser(id: string): Promise<boolean>;
+  updateUser(id: string, updates: Partial<InsertUser>): Promise<SafeUser | undefined>;
   
   // Incidentai
   getIncident(id: string): Promise<Incident | undefined>;
@@ -84,6 +86,7 @@ export class MemStorage implements IStorage {
         password: "mkl123MKL",
         role: "IT_specialistas",
         displayName: "Dominykas Kopijevas",
+        email: null,
       },
       {
         id: "employee-1",
@@ -91,6 +94,7 @@ export class MemStorage implements IStorage {
         password: "abc123ABC",
         role: "Darbuotojas",
         displayName: "Ona Mikalauskaitė",
+        email: null,
       },
       {
         id: "employee-2",
@@ -98,6 +102,7 @@ export class MemStorage implements IStorage {
         password: "jkl456JKL",
         role: "Darbuotojas",
         displayName: "Albas Mizgaitis",
+        email: null,
       },
       {
         id: "employee-3",
@@ -105,6 +110,7 @@ export class MemStorage implements IStorage {
         password: "abc123ABC",
         role: "Darbuotojas",
         displayName: "Varėnė Pavilionienė",
+        email: null,
       },
     ];
 
@@ -232,7 +238,8 @@ export class MemStorage implements IStorage {
     const id = randomUUID();
     const user: User = { 
       ...insertUser, 
-      id, 
+      id,
+      email: insertUser.email ?? null,
       role: insertUser.role === "Darbuotojas" || insertUser.role === "IT_specialistas"
         ? insertUser.role
         : "Darbuotojas" // default or handle error as needed
@@ -244,6 +251,26 @@ export class MemStorage implements IStorage {
   async getAllUsers(): Promise<SafeUser[]> {
     const allUsers = db.select().from(users).all();
     return allUsers.map(sanitizeUser);
+  }
+
+  async deleteUser(id: string): Promise<boolean> {
+    const result = db.delete(users).where(eq(users.id, id)).run();
+    return result.changes > 0;
+  }
+
+  async updateUser(id: string, updates: Partial<InsertUser>): Promise<SafeUser | undefined> {
+    const updateData: any = {};
+    if (updates.username !== undefined) updateData.username = updates.username;
+    if (updates.displayName !== undefined) updateData.displayName = updates.displayName;
+    if (updates.password !== undefined) updateData.password = updates.password;
+    if (updates.role !== undefined) updateData.role = updates.role;
+
+    if (Object.keys(updateData).length === 0) {
+      return this.getUser(id);
+    }
+
+    db.update(users).set(updateData).where(eq(users.id, id)).run();
+    return this.getUser(id);
   }
 
   // Incidentų metodai

@@ -9,13 +9,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { UserPlus, Users, Shield, User } from "lucide-react";
+import { UserPlus, Users, Shield, User, Trash2, Pencil } from "lucide-react";
 import type { SafeUser, UserRole } from "@shared/schema";
 
 export default function UserManagement() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [newUser, setNewUser] = useState({
     username: "",
     password: "",
@@ -75,17 +76,143 @@ export default function UserManagement() {
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newUser.username || !newUser.password || !newUser.displayName) {
+  const updateUserMutation = useMutation<
+    any,
+    Error,
+    { id: string; data: { username: string; password: string; displayName: string; role: UserRole } }
+  >({
+    mutationFn: async ({ id, data }) => {
+      const response = await fetch(`/api/users/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Nepavyko atnaujinti vartotojo");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      toast({
+        title: "Vartotojas atnaujintas",
+        description: "Vartotojo informacija sėkmingai atnaujinta",
+      });
+      setIsDialogOpen(false);
+      setEditingUserId(null);
+      setNewUser({
+        username: "",
+        password: "",
+        displayName: "",
+        role: "Darbuotojas",
+      });
+    },
+    onError: (error: Error) => {
       toast({
         title: "Klaida",
-        description: "Užpildykite visus laukus",
+        description: error.message,
         variant: "destructive",
       });
-      return;
+    },
+  });
+
+  const deleteUserMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      const response = await fetch(`/api/users/${userId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Nepavyko ištrinti vartotojo");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      toast({
+        title: "Vartotojas ištrinta",
+        description: "Vartotojas sėkmingai ištrinta iš sistemos",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Klaida",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (editingUserId) {
+      // Edit mode - password is optional
+      if (!newUser.username || !newUser.displayName) {
+        toast({
+          title: "Klaida",
+          description: "Naudotojo vardas ir pilnas vardas yra privalomi",
+          variant: "destructive",
+        });
+        return;
+      }
+      updateUserMutation.mutate({
+        id: editingUserId,
+        data: newUser,
+      });
+    } else {
+      // Create mode - all fields required
+      if (!newUser.username || !newUser.password || !newUser.displayName) {
+        toast({
+          title: "Klaida",
+          description: "Užpildykite visus laukus",
+          variant: "destructive",
+        });
+        return;
+      }
+      createUserMutation.mutate(newUser);
     }
-    createUserMutation.mutate(newUser);
+  };
+
+  const handleOpenDialog = (user?: SafeUser) => {
+    if (user) {
+      // Edit mode
+      setEditingUserId(user.id);
+      setNewUser({
+        username: user.username,
+        password: "",
+        displayName: user.displayName,
+        role: user.role,
+      });
+    } else {
+      // Create mode
+      setEditingUserId(null);
+      setNewUser({
+        username: "",
+        password: "",
+        displayName: "",
+        role: "Darbuotojas",
+      });
+    }
+    setIsDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+    setEditingUserId(null);
+    setNewUser({
+      username: "",
+      password: "",
+      displayName: "",
+      role: "Darbuotojas",
+    });
   };
 
   const getRoleBadge = (role: UserRole) => {
@@ -119,16 +246,20 @@ export default function UserManagement() {
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button>
+            <Button onClick={() => handleOpenDialog()}>
               <UserPlus className="h-4 w-4 mr-2" />
               Naujas vartotojas
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Sukurti naują vartotoją</DialogTitle>
+              <DialogTitle>
+                {editingUserId ? "Redaguoti vartotoją" : "Sukurti naują vartotoją"}
+              </DialogTitle>
               <DialogDescription>
-                Įveskite naujo vartotojo informaciją
+                {editingUserId
+                  ? "Atnaujinkite vartotojo informaciją"
+                  : "Įvaškite naujo vartotojo informaciją"}
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4 mt-4">
@@ -157,7 +288,7 @@ export default function UserManagement() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Slaptažodis *</Label>
+                <Label htmlFor="password">Slaptažodis {!editingUserId && "*"}</Label>
                 <Input
                   id="password"
                   type="password"
@@ -165,8 +296,8 @@ export default function UserManagement() {
                   onChange={(e) =>
                     setNewUser({ ...newUser, password: e.target.value })
                   }
-                  placeholder="Saugus slaptažodis"
-                  required
+                  placeholder={editingUserId ? "Palikite tuščia j jei nenorite keisti" : "Saugus slaptažodis"}
+                  required={!editingUserId}
                 />
               </div>
               <div className="space-y-2">
@@ -200,12 +331,27 @@ export default function UserManagement() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => setIsDialogOpen(false)}
+                  onClick={handleCloseDialog}
                 >
                   Atšaukti
                 </Button>
-                <Button type="submit" disabled={createUserMutation.isPending}>
-                  {createUserMutation.isPending ? "Kuriama..." : "Sukurti"}
+                <Button
+                  type="submit"
+                  disabled={
+                    editingUserId
+                      ? updateUserMutation.isPending
+                      : createUserMutation.isPending
+                  }
+                >
+                  {
+                    editingUserId
+                      ? updateUserMutation.isPending
+                        ? "Atnaujinama..."
+                        : "Atnaujinti"
+                      : createUserMutation.isPending
+                        ? "Kuriama..."
+                        : "Sukurti"
+                  }
                 </Button>
               </div>
             </form>
@@ -232,6 +378,7 @@ export default function UserManagement() {
                   <TableHead>Naudotojo vardas</TableHead>
                   <TableHead>Pilnas vardas</TableHead>
                   <TableHead>Vaidmuo</TableHead>
+                  <TableHead className="text-right">Veiksmai</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -240,6 +387,29 @@ export default function UserManagement() {
                     <TableCell className="font-mono">{user.username}</TableCell>
                     <TableCell>{user.displayName}</TableCell>
                     <TableCell>{getRoleBadge(user.role)}</TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleOpenDialog(user)}
+                        >
+                          <Pencil className="h-4 w-4 text-blue-500" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            if (confirm(`Ar tikrai norite ištrinti vartotoją ${user.username}?`)) {
+                              deleteUserMutation.mutate(user.id);
+                            }
+                          }}
+                          disabled={deleteUserMutation.isPending}
+                        >
+                          <Trash2 className="h-4 w-4 text-red-500" />
+                        </Button>
+                      </div>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
