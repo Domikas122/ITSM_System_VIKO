@@ -42,7 +42,7 @@ Windows:
 macOS:
 1. Right-click IncidentPilot-macos and select "Open"
    (First time only - macOS security prompt)
-2. Or run in Terminal: ./IncidentPilot-macos
+2. Or run in Terminal: chmod +x IncidentPilot-macos && ./IncidentPilot-macos
 3. Wait for "Server running on port 8080" message
 4. Open browser to http://localhost:8080
 
@@ -82,5 +82,5 @@ Cannot connect to database:
 - Confirm database is accessible
 
 ---
-Built: 2026-01-05
-Version: 1.0.0
+Built: 2026-01-13
+Version: 1.1.0
