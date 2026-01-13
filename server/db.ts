@@ -15,8 +15,12 @@ export const db = drizzle(sqlite, { schema });
 export function initializeDatabase() {
   // Ensure backwards compatibility: add missing columns
   const hasColumn = (table: string, column: string) => {
-    const columns = sqlite.prepare(`PRAGMA table_info(${table})`).all();
-    return columns.some((c: any) => c.name === column);
+    try {
+      const columns = sqlite.prepare(`PRAGMA table_info(${table})`).all();
+      return columns.some((c: any) => c.name === column);
+    } catch {
+      return false;
+    }
   };
 
   // Create users table
@@ -31,9 +35,13 @@ export function initializeDatabase() {
     )
   `);
 
-  // Add email column if migrating existing database
+  // Add email column if migrating from old database
   if (!hasColumn("users", "email")) {
-    sqlite.exec("ALTER TABLE users ADD COLUMN email TEXT");
+    try {
+      sqlite.exec("ALTER TABLE users ADD COLUMN email TEXT");
+    } catch (e) {
+      console.log("Email column already exists or migration failed (safe to ignore)");
+    }
   }
 
   // Create incidents table

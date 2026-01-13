@@ -60,13 +60,17 @@ export class MemStorage implements IStorage {
   private initializeDefaultData() {
     console.log("🔄 Checking for existing data...");
 
-    // Check if users already exist
-    const existingUsers = db.select().from(users).all();
-    console.log(`📊 Found ${existingUsers.length} existing users`);
-    
-    if (existingUsers.length > 0) {
-      console.log("✅ Database already has data, skipping initialization");
-      return;
+    try {
+      // Check if users already exist
+      const existingUsers = db.select().from(users).all();
+      console.log(`📊 Found ${existingUsers.length} existing users`);
+      
+      if (existingUsers.length > 0) {
+        console.log("✅ Database already has data, skipping initialization");
+        return;
+      }
+    } catch (error) {
+      console.log("⚠️ Error checking existing users (schema might be corrupted), reinitializing:", error);
     }
 
     console.log("📦 Initializing demo data...");
