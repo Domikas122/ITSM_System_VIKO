@@ -23,7 +23,7 @@ export function setupAuth(app: Express) {
         maxAge: 24 * 60 * 60 * 1000, // 24 hours
         httpOnly: true,
         secure: isProduction, // HTTPS only in production
-        sameSite: isProduction ? "strict" : "lax",
+        sameSite: "lax", // Allow cross-site requests
         domain: process.env.COOKIE_DOMAIN, // Set this for your domain
       },
     })
