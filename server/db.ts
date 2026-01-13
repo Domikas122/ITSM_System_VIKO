@@ -13,6 +13,12 @@ export const db = drizzle(sqlite, { schema });
 
 // Create tables if they don't exist
 export function initializeDatabase() {
+  // Ensure backwards compatibility: add missing columns
+  const hasColumn = (table: string, column: string) => {
+    const columns = sqlite.prepare(`PRAGMA table_info(${table})`).all();
+    return columns.some((c: any) => c.name === column);
+  };
+
   // Create users table
   sqlite.exec(`
     CREATE TABLE IF NOT EXISTS users (
@@ -24,6 +30,11 @@ export function initializeDatabase() {
       display_name TEXT NOT NULL
     )
   `);
+
+  // Add email column if migrating existing database
+  if (!hasColumn("users", "email")) {
+    sqlite.exec("ALTER TABLE users ADD COLUMN email TEXT");
+  }
 
   // Create incidents table
   sqlite.exec(`
