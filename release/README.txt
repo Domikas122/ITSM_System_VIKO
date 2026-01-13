@@ -1,8 +1,38 @@
-IncidentPilot - Standalone Executables
-======================================
+IncidentPilot - Incident Management System
+===========================================
 
-QUICK START
------------
+LIVE SYSTEM ACCESS
+------------------
+System URL: https://incident-pilot.fly.dev
+
+Test Accounts:
+  Admin:     domikas122 / mkl123MKL
+  Test User: var.pav / abc123ABC
+
+TESTING GUIDE
+-------------
+1. Login with either account above
+2. Admin account has full access to:
+   - Create/edit/delete incidents
+   - User management
+   - AI analysis features
+   - System configuration
+
+3. Test user account can:
+   - View incidents
+   - Create new incidents
+   - Add comments and updates
+
+4. Key features to test:
+   - Create incident with description
+   - AI-powered incident analysis
+   - Similar incident matching
+   - Status updates and timeline
+   - Search and filtering
+   - Dark/light theme toggle
+
+QUICK START (Local Installation)
+---------------------------------
 
 Windows:
 1. Double-click IncidentPilot-win.exe
